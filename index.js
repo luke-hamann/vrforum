@@ -2,7 +2,7 @@ import express from 'express';
 import Post from './models/post.js';
 import Reply from './models/reply.js';
 import Database from './models/database.js';
-import { page_full, page_fragment } from './views/stripmall.js';
+import { page_full, page_fragment } from './views/stripmall/stripmall.js';
 
 const app = express();
 const port = 8001;

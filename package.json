@@ -19,6 +19,7 @@
   "homepage": "https://github.com/luke-hamann/vrforum#readme",
   "dependencies": {
     "express": "^4.21.0",
-    "mysql2": "^3.11.3"
+    "mysql2": "^3.11.3",
+    "nunjucks": "^3.2.4"
   }
 }

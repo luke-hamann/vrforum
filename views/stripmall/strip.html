@@ -1,0 +1,7 @@
+{% set x_offset = 0 %}
+
+{% for topic in topics %}
+    <a-entity class="topic" position="{{ x_offset }} 0 0">
+        {% include "./topic.html" %}
+    </a-entity>
+{% endfor %}

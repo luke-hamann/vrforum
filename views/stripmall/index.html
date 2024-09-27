@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8" />
+    <title>VR Forum</title>
+    <script src="/lib/aframe.min.js"></script>
+    <script src="/js/client.js"></script>
+</head>
+<body>
+    <a-scene>
+        <a-entity
+            class="player"
+            camera
+            look-controls="pointerLockEnabled: true;"
+            wasd-controls
+            position="0 1.6 0"
+            ></a-entity>
+        <a-sky color="#87CEEB"></a-sky>
+        <a-plane
+            color="#90ee90"
+            height="1000"
+            width="1000"
+            position="0 -0.1 0"
+            rotation="-90 0 0"
+            ></a-plane>
+        <a-plane
+            color="#a9a9a9"
+            height="1000"
+            width="10"
+            rotation="-90 0 0"
+            ></a-plane>
+        <a-entity class="scene">
+            {{ content | safe }}
+        </a-entity>
+    </a-scene>
+</body>
+</html>
