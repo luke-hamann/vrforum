@@ -62,4 +62,26 @@ export default class Database {
 
         return topics;
     }
+
+    /**
+     * @param {Post} post
+     */
+    static async add_post(post) {
+        const connection = await mysql.createConnection(this.config);
+        await connection.query(`
+            INSERT INTO posts (title, body, topic_id)
+            VALUES (?, ?, ?);
+        `, [post.title, post.body, post.topic_id]);
+    }
+
+    /**
+     * @param {Reply} reply 
+     */
+    static async add_reply(reply) {
+        const connection = await mysql.createConnection(this.config);
+        await connection.query(`
+            INSERT INTO replies (post_id, body)
+            VALUES (?, ?);
+        `, [reply.post_id, reply.body]);
+    }
 }
