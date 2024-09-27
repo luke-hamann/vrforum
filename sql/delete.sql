@@ -1,0 +1,2 @@
+DROP DATABASE IF EXISTS vrforum;
+DROP USER IF EXISTS vrforum;
