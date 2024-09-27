@@ -8,8 +8,19 @@ import World from '../models/world.js';
  * @param {World} world
  * @returns string
  */
-export default function stripmall(world) {
-    var topic = world.topics[0];
+export default function stripmall(topics) {
+    var content = '';
+
+    var x_offset = 0;
+    for (var topic of topics) {
+        content += `
+            <a-entity position="${x_offset} 0 0">
+                ${render_topic(topic)}
+            </a-entity>
+        `;
+        x_offset += 20;
+    }
+
     return `
         <!DOCTYPE html>
         <html lang="en-us">
@@ -27,17 +38,28 @@ export default function stripmall(world) {
                     position="0 1.6 0"
                     ></a-entity>
                 <a-sky color="#87CEEB"></a-sky>
-                <a-entity>${render_topic(topic)}</a-entity>
+                <a-plane
+                    color="#90ee90"
+                    height="1000"
+                    width="1000"
+                    position="0 -0.01 0"
+                    rotation="-90 0 0"
+                    ></a-plane>
+                <a-entity position="-20 0 -20" rotation="0 90 0">
+                    ${content}
+                </a-entity>
             </a-scene>
         </body>
         </html>
     `;
 }
 
+
+
 /**
  * @param {string} form_title
  * @param {boolean} title_field_enabled
- * @returns 
+ * @return {string}
  */
 function build_form(form_title, title_field_enabled) {
     // Form title
@@ -106,7 +128,7 @@ function render_reply(reply) {
                 color: black;
                 anchor: left;
                 width: 2;
-                value: ${reply.date_time};
+                value: ${reply.date_time.toUTCString()};
             "></a-entity>
         <a-entity
             position="0 1.6 0"
@@ -139,7 +161,7 @@ function render_post(post) {
                 color: black;
                 anchor: left;
                 width: 2;
-                value: ${post.date_time};
+                value: ${post.date_time.toUTCString()};
             "></a-entity>
         <a-entity
             position="0 1.6 0"
@@ -153,7 +175,7 @@ function render_post(post) {
 }
 
 /**
- * @param {Thread} thread - The Thread to render
+ * @param {Thread} thread
  * @return {string}
  */
 function render_thread(thread) {

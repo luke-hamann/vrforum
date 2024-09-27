@@ -3,7 +3,6 @@ import Post from './post.js';
 import Reply from './reply.js';
 import Thread from './thread.js';
 import Topic from './topic.js';
-import World from './world.js';
 
 export default class Database {
     static config = {
@@ -13,31 +12,54 @@ export default class Database {
         database: 'vrforum'
     };
 
-    static get_world() {
-        return new World([
-            new Topic(1, 'Programming', [
-                new Thread(
-                    new Post(1, 'First Post', 'Hello\nWorld', 1, '2024-09-27'),
-                    [
-                        new Reply(1, 1, 'wow\nza', '2024-09-28'),
-                        new Reply(2, 1, 'nice\ncool', '2024-09-29')
-                    ]
-                ),
-                new Thread(
-                    new Post(2, 'Second Post', 'Goodbye\nWorld', 2, '2024-09-28'),
-                    [
-                        new Reply(3, 2, 'body\nbody', '2024-09-29')
-                    ]
-                ),
-                new Thread(
-                    new Post(3, 'Third Post', 'What you doing?', 3, '2024-09-29'),
-                    [
-                        new Reply(4, 3, 'aa\nbb', '2024-09-30'),
-                        new Reply(5, 3, 'cc\ndd', '2024-10-01'),
-                        new Reply(6, 3, 'ee\nff', '2024-10-02')
-                    ]
-                )
-            ])
-        ]);
+    /**
+     * @return {Topic[]}
+     */
+    static async get_topics() {
+        const connection = await mysql.createConnection(this.config);
+
+        // Get all posts
+        var [rows, _] = await connection.query(`
+            SELECT id, title, body, topic_id, date_time
+            FROM posts
+            ORDER BY date_time;
+        `);
+
+        const all_posts = rows.map((row) =>
+            new Post(row.id, row.title, row.body, row.topic_id,
+                new Date(Date.parse(row.date_time)))
+        );
+
+        // Get all replies
+        var [rows, _] = await connection.query(`
+            SELECT id, post_id, body, date_time
+            FROM replies
+            ORDER BY date_time;
+        `);
+        const all_replies = rows.map((row) =>
+            new Reply(row.id, row.post_id, row.body,
+                new Date(Date.parse(row.date_time)))
+        );
+
+        // Generate threads based on posts and replies
+        const threads = all_posts.map((post) => new Thread(
+                post,
+                all_replies.filter((reply) => (reply.post_id == post.id))
+            )
+        );
+
+        // Get all topics
+        var [rows, _] = await connection.query(`
+            SELECT id, name
+            FROM topics
+            ORDER BY id;
+        `);
+        const topics = rows.map((row) => new Topic(
+            row.id,
+            row.name,
+            threads.filter((thread) => (thread.post.topic_id == row.id))
+        ));
+
+        return topics;
     }
 }
