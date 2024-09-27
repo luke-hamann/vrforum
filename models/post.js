@@ -1,4 +1,4 @@
-class Post {
+export default class Post {
     constructor(id, title, body, topic_id, date_time) {
         this.id = id;
         this.title = title;
