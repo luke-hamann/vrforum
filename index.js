@@ -1,8 +1,9 @@
 import express from 'express';
+import pkg from 'nunjucks';
+const render_template = pkg.render;
 import Post from './models/post.js';
 import Reply from './models/reply.js';
 import Database from './models/database.js';
-import { page_full, page_fragment } from './views/stripmall/stripmall.js';
 
 const app = express();
 const port = 8001;
@@ -11,8 +12,9 @@ app.use(express.static('static'));
 app.use(express.json());
 
 app.get('/', async (request, response) => {
-    const topics = await Database.get_topics();
-    response.send(page_full(topics));
+    var topics = await Database.get_topics();
+    var content = render_template('./views/stripmall/index.html', {topics});
+    response.send(content);
 });
 
 app.post('/', async (request, response) => {
@@ -31,7 +33,8 @@ app.post('/', async (request, response) => {
     }
 
     var topics = await Database.get_topics();
-    response.send(page_fragment(topics));
+    var content = render_template('./views/stripmall/stripmall.html', {topics});
+    response.send(content);
 });
 
 app.listen(port, () => {

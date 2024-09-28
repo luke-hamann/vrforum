@@ -12,7 +12,6 @@ export default class Thread {
     }
 
     /**
-     * 
      * @return {number} The length of the thread
      */
     get_length() {

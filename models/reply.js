@@ -1,6 +1,5 @@
 export default class Reply {
     /**
-     * 
      * @param {number} id 
      * @param {number} post_id 
      * @param {string} body 

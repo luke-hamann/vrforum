@@ -1,8 +1,8 @@
 {% set x_offset = 0 %}
 {% for topic in topics %}
-    <a-entity class="topic" position="{{ x_offset }} 0 0">
-        {% include "./topic.html" %}
-    </a-entity>
-    {% set topic_width = 2 * (topic.threads.length + 2) %}
-    {% set x_offset = x_offset + topic_width + 2 %}
+<a-entity class="topic" position="{{ x_offset }} 0 0">
+    {% include "./topic.html" %}
+</a-entity>
+{% set topic_width = 2 * (topic.threads.length + 2) %}
+{% set x_offset = x_offset + topic_width + 2 %}
 {% endfor %}

@@ -43,10 +43,9 @@ export default class Database {
 
         // Generate threads based on posts and replies
         const threads = all_posts.map((post) => new Thread(
-                post,
-                all_replies.filter((reply) => (reply.post_id == post.id))
-            )
-        );
+            post,
+            all_replies.filter((reply) => (reply.post_id == post.id))
+        ));
 
         // Get all topics
         var [rows, _] = await connection.query(`

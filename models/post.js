@@ -1,6 +1,5 @@
 export default class Post {
     /**
-     * 
      * @param {number} id 
      * @param {string} title 
      * @param {string} body 

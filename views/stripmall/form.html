@@ -1,49 +1,30 @@
 <a-entity>
-    <a-entity
-        position="0 2 0"
-        text="
+    <a-entity position="0 2 0" text="
             color: black;
             anchor: left;
             width: 5;
             value: {{ form_title }};
         "></a-entity>
     {% if title_field %}
-    <a-entity
-        position="0 1.8 0"
-        text="
+    <a-entity position="0 1.8 0" text="
             color: black;
             anchor: left;
             value: Title;
         "></a-entity>
-    <a-entity
-        class="textbox"
-        position="0 1.8 0.1"
-        text="
+    <a-entity class="textbox" position="0 1.8 0.1" text="
         "></a-entity>
-    <a-plane
-        position="0.5 1.7 0"
-        color="#FFF"
-        height=0.1
-        width=1
-        ></a-plane>
+    <a-plane position="0.5 1.7 0" color="#FFF" height=0.1 width=1></a-plane>
     {% endif %}
-    <a-entity
-        position="
+    <a-entity position="
             0
             {% if title_field %}1.5{% else %}1.8{% endif %}
-            0"
-        text="
+            0" text="
             color: black;
             anchor: left;
             value: Body;
     "></a-entity>
-    <a-plane
-        position="
+    <a-plane position="
             0.5
             {% if title_field %}1.1{% else %}1.4{% endif %}
-            0"
-        color="#FFF"
-        height=0.6
-        width=1
-        ></a-plane>
+            0" color="#FFF" height=0.6 width=1></a-plane>
 </a-entity>
