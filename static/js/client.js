@@ -1,126 +1,61 @@
-class TextBox {
-    constructor(text, x, y, z) {
-        this._elm = document.createElement('a-entity');
-        this._elm.setAttribute('position', `${x} ${y} ${z}`);
-        this.setText(text);
-    }
+import HeadsUpDisplay from './headsupdisplay.js';
 
-    getElement() {
-        return this._elm();
-    }
+/**
+ * @param {Map} post
+ */
+async function submitPost(post) {
+    var topicIds = new Map(Array(...document.querySelectorAll('[data-type=topic]')).map((elm) => [elm.getAttribute('data-name'), elm.getAttribute('data-id')]));
 
-    getText() {
-        return this._text;
-    }
+    var action = 'post';
+    var topic_id = topicIds.get(post.get('topic'));
+    var title = post.get('title');
+    var body = post.get('body');
+    var payload = { action, topic_id, title, body };
+    console.log('payload ' + payload);
+    var response = await fetch(window.location.origin, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    });
 
-    setText(text) {
-        this._text = text;
-        this._elm.setAttribute('text', {
-            color: 'black',
-            value: text
-        })
-    }
+    var text = await response.text();
 
-    appendText(text) {
-        this.setText(this._text + text);
-    }
+    return text;
 }
-
-class UserInterface {
-    constructor() {
-        this._elm = document.createElement('a-entity');
-
-        this._backdrop = document.createElement('a-plane');
-        this._backdrop.setAttribute('position', '-1 1 -2');
-        this._backdrop.setAttribute('color', '#FFF');
-
-        this._text = document.createElement('a-entity');
-        this._text.setAttribute('position', '-1 1 -1.95');
-
-        this._elm.appendChild(this._backdrop);
-        this._elm.appendChild(this._text);
-
-        this.viewPostMode();
-    }
-
-    getElement() {
-        return this._elm;
-    }
-
-    show() {
-        this._elm.setAttribute('visible', true);
-    }
-
-    hide() {
-        this._elm.setAttribute('visible', false);
-    }
-
-    isVisible() {
-        return this._elm.getAttribute('visible');
-    }
-
-    toggleVisible() {
-        this._elm.setAttribute('visible', !this._elm.getAttribute('visible'));
-    }
-
-    _renderText(text) {
-        this._text.setAttribute('text', {
-            align: 'left',
-            color: 'black',
-            value: text
-        });
-    }
-
-    getMode() {
-        return this._mode;
-    }
-
-    toggleMode() {
-        if (this._mode == 'post') {
-            this.viewReplyMode();
-        } else {
-            this.viewPostMode();
-        }
-    }
-
-    viewPostMode() {
-        this._renderText('New Post');
-        this._mode = 'post';
-    }
-
-    viewReplyMode() {
-        this._renderText('New Reply');
-        this._mode = 'reply';
-    }
-}
-
-const CHARACTERS = '`1234567890-=~!@#$%^&*()_+qwertyuiop[]\\QWERTYUIOP{}|asdfghjkl;\'ASDFGHJKL:"zxcvbnm,./ZXCVBNM<>?'.split('');
 
 AFRAME.registerComponent('player', {
     schema: {},
     init: function () {
-        // Create user interface
-        var ui = new UserInterface();
-        ui.hide();
-        this.el.appendChild(ui.getElement());
+        const scene = document.querySelector('.scene');
+        const hud = new HeadsUpDisplay();
+        const toggleHud = () => {
+            this.el.toggleAttribute('wasd-controls');
+            hud.toggleVisible();
+        };
 
-        window.addEventListener('keydown', (event) => {
+        hud.hide();
+        this.el.appendChild(hud.getElement());
+
+        window.addEventListener('keydown', async (event) => {
+            // If the user toggles the 
             if (event.key == 'Enter' && event.shiftKey) {
-                this.el.toggleAttribute('wasd-controls');
-                ui.toggleVisible();
+                toggleHud();
                 return;
             }
 
-            if (!ui.isVisible()) return;
+            if (!hud.isVisible()) return;
+            event.preventDefault();
+            var result = hud.processKeyDownEvent(event);
 
-            if (event.key == 'ArrowLeft' || event.key == 'ArrowRight') {
-                ui.toggleMode();
-                return;
+            if (result instanceof Map) {
+                console.log('here');
+                var text = await submitPost(result);
+                scene.innerHTML = text;
+                hud.reset();
+                toggleHud();
             }
-
-            if (!CHARACTERS.includes(event.key)) return;
-
-            console.log(event.key);
         });
     }
 });
@@ -137,11 +72,11 @@ async function form() {
         topic_id = Number(window.prompt('Topic id?'));
         title = window.prompt('Title?');
         body = window.prompt('Body?');
-        payload = {action, topic_id, title, body};
+        payload = { action, topic_id, title, body };
     } else {
         post_id = window.prompt('Post id?');
         body = window.prompt('Body?');
-        payload = {action, post_id, body};
+        payload = { action, post_id, body };
     }
 
     var response = await fetch(window.location.origin, {
@@ -153,7 +88,7 @@ async function form() {
     });
 
     var text = await response.text();
-    
+
     return text;
 }
 
