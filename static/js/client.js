@@ -11,7 +11,6 @@ async function submitPost(post) {
     var title = post.get('title');
     var body = post.get('body');
     var payload = { action, topic_id, title, body };
-    console.log('payload ' + payload);
     var response = await fetch(window.location.origin, {
         method: 'post',
         headers: {
@@ -39,7 +38,7 @@ AFRAME.registerComponent('player', {
         this.el.appendChild(hud.getElement());
 
         window.addEventListener('keydown', async (event) => {
-            // If the user toggles the 
+            // If the user toggles the hud
             if (event.key == 'Enter' && event.shiftKey) {
                 toggleHud();
                 return;
@@ -50,7 +49,6 @@ AFRAME.registerComponent('player', {
             var result = hud.processKeyDownEvent(event);
 
             if (result instanceof Map) {
-                console.log('here');
                 var text = await submitPost(result);
                 scene.innerHTML = text;
                 hud.reset();
@@ -63,7 +61,7 @@ AFRAME.registerComponent('player', {
 // Prompt-based posting and replying
 
 async function form() {
-    var action, topic_id, post_id, title, body;
+    var action, topic_id, post_id, title, body, payload;
 
     action = window.prompt('Action?');
     if (action != 'post' && action != 'reply') return;
@@ -92,14 +90,12 @@ async function form() {
     return text;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    //const player = document.querySelector('.player');
-    const scene = document.querySelector('.scene');
-    window.addEventListener('keydown', async (event) => {
-        if (event.key == 'Enter' && event.ctrlKey) {
-            //player.toggleAttribute('wasd-controls');
-            var text = await form();
-            scene.innerHTML = text;
-        }
-    });
+//const player = document.querySelector('.player');
+const scene = document.querySelector('.scene');
+window.addEventListener('keydown', async (event) => {
+    if (event.key == 'Enter' && event.ctrlKey) {
+        //player.toggleAttribute('wasd-controls');
+        var text = await form();
+        scene.innerHTML = text;
+    }
 });
