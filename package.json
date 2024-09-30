@@ -1,0 +1,25 @@
+{
+  "name": "vrforum",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luke-hamann/vrforum.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/luke-hamann/vrforum/issues"
+  },
+  "homepage": "https://github.com/luke-hamann/vrforum#readme",
+  "dependencies": {
+    "express": "^4.21.0",
+    "mysql2": "^3.11.3",
+    "nunjucks": "^3.2.4"
+  }
+}

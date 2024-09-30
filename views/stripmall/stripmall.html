@@ -1,0 +1,33 @@
+{# Split the topics into two groups #}
+
+{% set topics_left = [] %}
+{% set topics_right = [] %}
+{% set toggle = true %}
+{% for topic in topics %}
+    {% if toggle %}
+        {% if topics_left.push(topic) %}{% endif %}
+    {% else %}
+        {% if topics_right.push(topic) %}{% endif %}
+    {% endif %}
+    {% set toggle = not toggle %}
+{% endfor %}
+
+{# Determine how far the right strip needs to be moved away #}
+
+{% set offset = 0 %}
+{% for topic in topics_right %}
+    {# Account for each topic area width #}
+    {% set offset = offset - 2 * (topic.threads.length + 2) %}
+{% endfor %}
+
+{# Account for spacing between topic areas #}
+{% set offset = offset - 2 * (topics_right.length - 1) - 10 %}
+
+<a-entity position="-10 0 -10" rotation="0 90 0">
+    {% set topics = topics_left %}
+    {% include './strip.html' %}
+</a-entity>
+<a-entity position="10 0 {{ offset }}" rotation="0 -90 0">
+    {% set topics = topics_right | reverse %}
+    {% include './strip.html' %}
+</a-entity>

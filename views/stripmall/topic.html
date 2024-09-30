@@ -1,0 +1,31 @@
+{% set width = 2 * (topic.threads.length + 2) %}
+{% set height = 2 * (topic.get_longest_thread_length() + 2) %}
+
+<a-entity
+    position="0 3 0"
+    text="
+        color: black;
+        anchor: left;
+        width: 10;
+        value: {{ topic.name }};
+    ">
+</a-entity>
+<a-plane
+    position="{{ width / 2 }} 0 {{ height / -2 }}"
+    height="{{ height }}"
+    width="{{ width }}"
+    rotation="-90 0 0"></a-plane>
+
+{% set x_offset = 1 %}
+{% for thread in topic.threads %}
+    <a-entity class="thread" position="{{ x_offset }} 0 -1">
+        {% include './thread.html' %}
+    </a-entity>
+    {% set x_offset = x_offset + 2 %}
+{% endfor %}
+
+<a-entity class="form" position="{{ x_offset }} 0 -1">
+    {% set form_title = "New Post" %}
+    {% set title_field = true %}
+    {% include './form.html' %}
+</a-entity>
