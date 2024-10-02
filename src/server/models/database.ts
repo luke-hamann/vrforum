@@ -36,6 +36,78 @@ export default class Database {
         return topics;
     }
 
+    static async get_topic(topic_id: number): Promise<Topic> {
+        var connection: mysql.Connection =
+            await mysql.createConnection(this.config);
+
+        // Get topic
+        var [queryResult, _] = await connection.query(`
+            SELECT id, name
+            FROM topics
+            WHERE id = ?
+        `, [topic_id]);
+
+        var topic_rows = queryResult as {id: number, name: string}[];
+        var topic_row = topic_rows[0];
+        var topic = new Topic(topic_row.id, topic_row.name, false, []);
+
+        // Get posts
+
+        var [queryResult, _] = await connection.query(`
+            SELECT id, title, body, topic_id, date_time
+            FROM posts
+            WHERE topic_id = ?
+            ORDER BY date_time
+        `, [topic_id]);
+
+        var post_rows = queryResult as {
+            id: number,
+            title: string,
+            body: string,
+            topic_id: number,
+            date_time: string
+        }[];
+
+        var posts = post_rows.map(row => new Post(
+            row.id,
+            row.title,
+            row.body,
+            row.topic_id,
+            new Date(Date.parse(row.date_time))
+        ));
+
+        // Get replies
+
+        var [queryResult, _] = await connection.query(`
+            SELECT r.id, r.post_id, r.body, r.date_time
+            FROM posts p
+                JOIN replies r ON (p.id = r.post_id)
+            WHERE p.topic_id = ?
+            ORDER by r.post_id, r.date_time;
+        `, [topic_id]);
+
+        var reply_rows = queryResult as {
+            id: number,
+            post_id: number,
+            body: string,
+            date_time: string
+        }[];
+
+        var replies = reply_rows.map((row) => new Reply(
+            row.id, row.post_id, row.body, new Date(Date.parse(row.date_time))
+        ));
+
+        // Build Threads
+        var threads = posts.map((post) => new Thread(
+            post,
+            replies.filter((reply) => reply.post_id = post.id)
+        ));
+
+        topic.threads = threads;
+
+        return topic;
+    }
+
     static async get_topics(): Promise<Topic[]> {
         var connection: mysql.Connection;
         var queryResult: mysql.QueryResult;

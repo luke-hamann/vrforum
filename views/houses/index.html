@@ -6,12 +6,22 @@
     <title>VR Forum</title>
     <script src="/lib/aframe.min.js"></script>
     <script type="module" src="/js/client.js"></script>
+    <script type="module" src="/js/components/cursorlistener.js"></script>
 </head>
 
 <body>
     <a-scene keyboard-shortcuts="enterVR: false">
-        <a-entity camera look-controls="pointerLockEnabled: true;" wasd-controls
-            position="0 1.6 0" player>
+        <a-entity
+            camera
+            look-controls="pointerLockEnabled: true;"
+            wasd-controls
+            position="0 1.6 0">
+            <a-entity
+                cursor
+                position="0 0 -1"
+                geometry="primitive: ring; radiusInner: 0.01; radiusOuter: 0.02"
+                material="color: gray; shader: flat">
+            </a-entity>
         </a-entity>
         <a-sky color="#87CEEB"></a-sky>
         <a-plane color="#90ee90" height="1000" width="1000" position="0 -0.1 0"

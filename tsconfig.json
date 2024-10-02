@@ -1,11 +1,11 @@
 {
     "compilerOptions": {
         "target": "ES2015",
-        "module": "NodeNext",
+        "module": "ES2015",
         "sourceMap": true,
         "outDir": "./build",
         "esModuleInterop": true,
-        "moduleResolution": "NodeNext",
+        "moduleResolution": "Bundler",
         "forceConsistentCasingInFileNames": true,
         "strict": true,
         "allowJs": false

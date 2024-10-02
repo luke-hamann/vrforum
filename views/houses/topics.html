@@ -52,11 +52,12 @@
                 width: 10;">
         </a-entity>
         <a-plane
-            color="lightbrown"
+            color="brown"
             width="{{ house_door_width }}"
             height="{{ house_door_height }}"
             rotation="0 0 -90"
-            position="0 {{ house_door_height / 2}} 0.05">
+            position="0 {{ house_door_height / 2}} 0.05"
+            link="href: /topic/{{ topic.id }}/">
         </a-plane>
     </a-entity>
     {% set x_offset = x_offset + house_width + house_spacing %}
