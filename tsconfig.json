@@ -1,11 +1,14 @@
 {
     "compilerOptions": {
-        "outDir": "./built",
-        "allowJs": true,
         "target": "ES2015",
         "module": "NodeNext",
+        "sourceMap": true,
+        "outDir": "./build",
+        "esModuleInterop": true,
         "moduleResolution": "NodeNext",
-        "esModuleInterop": true
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "allowJs": false
     },
     "include": ["./src/**/*"]
 }
