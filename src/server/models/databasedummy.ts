@@ -8,7 +8,7 @@ import Topic from './topic.js';
 export default class DatabaseDummy {
     static get_topics() {
         return [
-            new Topic(1, 'Programming', [
+            new Topic(1, 'Programming', false, [
                 new Thread(
                     new Post(1, 'First Post', 'Hello\nWorld', 1, new Date(Date.UTC(2024, 9, 27))),
                     [

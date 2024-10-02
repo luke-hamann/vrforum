@@ -13,12 +13,17 @@ app.use('/lib', express.static('lib'));
 app.use('/js', express.static('built/client'));
 
 app.get('/', (_: express.Request, response: express.Response): void => {
-    Database.get_topics().then((topics: Topic[]) => {
-        var content = render('./views/stripmall/index.html', {topics});
-        response.send(content);
-    }, () => {
-        response.status(500).send('<h1>500</h1><p>Something went wrong.</p>');
-    })
+    Database.get_topics_shallow()
+    .then(
+        (topics: Topic[]) => {
+            var content: string = render('./views/houses/topics.html', { topics });
+            var page: string = render('./views/houses/index.html', { content });
+            response.send(page);
+        },
+        () => {
+            response.status(500).send('<h1>500</h1><p>Something went wrong.</p>');
+        }
+);
 });
 
 app.listen(port, () => {

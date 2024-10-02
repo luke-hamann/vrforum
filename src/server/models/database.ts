@@ -1,6 +1,6 @@
 'use strict';
 
-import mysql, { RowDataPacket } from 'mysql2/promise';
+import mysql from 'mysql2/promise';
 import Post from './post.js';
 import Reply from './reply.js';
 import Thread from './thread.js';
@@ -14,6 +14,28 @@ export default class Database {
         database: 'vrforum'
     };
 
+    static async get_topics_shallow(): Promise<Topic[]> {
+        var connection: mysql.Connection =
+            await mysql.createConnection(this.config);
+
+        var [queryResult, _] = await connection.query(`
+            SELECT id, name
+            FROM topics
+            ORDER BY LOWER(name)
+        `);
+        
+        var topic_rows = queryResult as {
+            id: number,
+            name: string
+        }[];
+
+        var topics: Topic[] = topic_rows.map((row) => new Topic(
+            row.id, row.name, true, [])
+        );
+
+        return topics;
+    }
+
     static async get_topics(): Promise<Topic[]> {
         var connection: mysql.Connection;
         var queryResult: mysql.QueryResult;
@@ -22,7 +44,8 @@ export default class Database {
         var threads: Thread[];
         var topics: Topic[];
 
-        connection = await mysql.createConnection(this.config);
+        connection =
+            await mysql.createConnection(this.config);
 
         // Get all posts
         [queryResult, _] = await connection.query(`
@@ -40,7 +63,11 @@ export default class Database {
         }[];
 
         all_posts = post_rows.map(row => new Post(
-            row.id, row.title, row.body, row.topic_id, new Date(Date.parse(row.date_time))
+            row.id,
+            row.title,
+            row.body,
+            row.topic_id,
+            new Date(Date.parse(row.date_time))
         ));
 
         // Get all replies
@@ -51,11 +78,17 @@ export default class Database {
         `);
 
         var reply_rows = queryResult as {
-            id: number, post_id: number, body: string, date_time: string
+            id: number,
+            post_id: number,
+            body: string,
+            date_time: string
         }[];
 
         all_replies = reply_rows.map(row => new Reply(
-            row.id, row.post_id, row.body, new Date(Date.parse(row.date_time))
+            row.id,
+            row.post_id,
+            row.body,
+            new Date(Date.parse(row.date_time))
         ));
 
         // Generate threads based on posts and replies
@@ -72,14 +105,15 @@ export default class Database {
         `);
 
         var topic_rows = queryResult as {
-            id: number, name: string
+            id: number,
+            name: string
         }[];
 
-        topics = topic_rows.map((row) => new Topic(
-            Object(row).id,
-            Object(row).name,
-            threads.filter((thread) => (thread.post.topic_id == Object(row).id))
-        ));
+        var topics: Topic[] = topic_rows.map((row) =>
+            new Topic(row.id, row.name, false,
+                threads.filter((thread) => (thread.post.topic_id == row.id))
+            )
+        );
 
         return topics;
     }
