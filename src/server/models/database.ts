@@ -1,4 +1,6 @@
-import mysql from 'mysql2/promise';
+'use strict';
+
+import mysql, { RowDataPacket } from 'mysql2/promise';
 import Post from './post.js';
 import Reply from './reply.js';
 import Thread from './thread.js';
@@ -12,22 +14,31 @@ export default class Database {
         database: 'vrforum'
     };
 
-    /**
-     * @return {Topic[]}
-     */
-    static async get_topics() {
-        const connection = await mysql.createConnection(this.config);
+    static async get_topics(): Promise<Topic[]> {
+        var connection: mysql.Connection;
+        var all_posts: Post[];
+        var all_replies: Reply[];
+        var threads: Thread[];
+        var topics: Topic[];
+
+        connection = await mysql.createConnection(this.config);
 
         // Get all posts
-        var [rows, _] = await connection.query(`
+        var [result, _] = await connection.query(`
             SELECT id, title, body, topic_id, date_time
             FROM posts
             ORDER BY date_time;
         `);
 
-        const all_posts = rows.map((row) =>
-            new Post(row.id, row.title, row.body, row.topic_id,
-                new Date(Date.parse(row.date_time)))
+        for (var row of Object(result)) {
+            var post: Post = new Post(row.id, row.title, row.body, row.topic_id,
+                new Date(Date.parse(row.date_time)));
+            all_posts.push(post);
+        }
+        console.log(all_posts);
+        Array(rows).map((row) =>
+            new Post(Object(row).id, Object(row).title, Object(row).body, Object(row).topic_id,
+                new Date(Date.parse(Object(row).date_time)))
         );
 
         // Get all replies
@@ -36,13 +47,13 @@ export default class Database {
             FROM replies
             ORDER BY date_time;
         `);
-        const all_replies = rows.map((row) =>
-            new Reply(row.id, row.post_id, row.body,
-                new Date(Date.parse(row.date_time)))
+        all_replies = Array(rows).map((row) =>
+            new Reply(Object(row).id, Object(row).post_id, Object(row).body,
+                new Date(Date.parse(Object(row).date_time)))
         );
 
         // Generate threads based on posts and replies
-        const threads = all_posts.map((post) => new Thread(
+        threads = all_posts.map((post) => new Thread(
             post,
             all_replies.filter((reply) => (reply.post_id == post.id))
         ));
@@ -53,19 +64,16 @@ export default class Database {
             FROM topics
             ORDER BY id;
         `);
-        const topics = rows.map((row) => new Topic(
-            row.id,
-            row.name,
-            threads.filter((thread) => (thread.post.topic_id == row.id))
+        topics = Array(rows).map((row) => new Topic(
+            Object(row).id,
+            Object(row).name,
+            threads.filter((thread) => (thread.post.topic_id == Object(row).id))
         ));
 
         return topics;
     }
 
-    /**
-     * @param {Post} post
-     */
-    static async add_post(post) {
+    static async add_post(post: Post) {
         const connection = await mysql.createConnection(this.config);
         await connection.query(`
             INSERT INTO posts (title, body, topic_id)
@@ -73,10 +81,7 @@ export default class Database {
         `, [post.title, post.body, post.topic_id]);
     }
 
-    /**
-     * @param {Reply} reply 
-     */
-    static async add_reply(reply) {
+    static async add_reply(reply: Reply): Promise<void> {
         const connection = await mysql.createConnection(this.config);
         await connection.query(`
             INSERT INTO replies (post_id, body)
