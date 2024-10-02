@@ -14,7 +14,6 @@ app.use('/js', express.static('built/client'));
 
 app.get('/', (_: express.Request, response: express.Response): void => {
     Database.get_topics().then((topics: Topic[]) => {
-        console.log(topics);
         var content = render('./views/stripmall/index.html', {topics});
         response.send(content);
     }, () => {

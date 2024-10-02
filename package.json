@@ -5,7 +5,7 @@
   "main": "built/server/controller.js",
   "type": "module",
   "scripts": {
-    "compile": "rmdir /s .\\built && tsc"
+    "compile": "rmdir /s /q .\\built && tsc"
   },
   "repository": {
     "type": "git",
