@@ -8,7 +8,8 @@
         "moduleResolution": "Bundler",
         "forceConsistentCasingInFileNames": true,
         "strict": true,
-        "allowJs": false
+        "allowJs": false,
+        "incremental": true
     },
     "include": ["./src/**/*"]
 }

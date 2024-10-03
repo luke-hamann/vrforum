@@ -5,8 +5,8 @@
   "main": "built/server/controller.js",
   "type": "module",
   "scripts": {
-    "build": "rmdir /s /q .\\build && mkdir .\\build && tsc",
-    "go": "node ./build/server/index.js"
+    "build": "tsc",
+    "serve": "node ./build/server/index.js"
   },
   "repository": {
     "type": "git",
