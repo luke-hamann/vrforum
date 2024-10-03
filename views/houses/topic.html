@@ -43,7 +43,7 @@
         data-id="{{ topic.id }}"
         data-name="{{ topic.name }}"
         position="{{ corridor_width / 2 }} 0 {{ threads_z_offset_initial + 3 }}"
-        cursorlistener>
+        formlauncher="action: post; id: {{ topic.id }}; name: {{ topic.name}};">
         <a-box
             color="brown"
             width="0.5"
@@ -95,10 +95,8 @@
             {% set x_offset = - thread_padding - post_footprint_width %}
             {% set z_offset = - thread_padding - post_footprint_depth %}
             <a-entity
-                data-type="post"
-                data-id="{{ thread.post.id }}"
                 position="{{ x_offset }} 0 {{ z_offset }}"
-                cursorlistener>
+                formlauncher="action: reply; id: {{ thread.post.id }};">
                 {{ backdrop('post-backdrop', 'white', 1.5, 1.5, 0, 1.5, -0.01) }}
                 {{ text('post-title', 'left', 'black', 1.5, thread.post.title, 0.25, 2, 0) }}
                 {{ text('post-details', 'left', 'black', 1, thread.post.date_time.toDateString() + '\n\n' + thread.post.body, 0, 1.7, 0) }}
