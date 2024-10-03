@@ -5,7 +5,9 @@
     <meta charset="utf-8" />
     <title>VR Forum</title>
     <script src="/lib/aframe.min.js"></script>
-    <script type="module" src="/js/client.js"></script>
+    <script type="module" src="/js/components/formlauncher.js"></script>
+    <script type="module" src="/js/components/input.js"></script>
+    <script type="module" src="/js/components/form.js"></script>
 </head>
 
 <body>
@@ -16,9 +18,10 @@
             wasd-controls
             position="0 1.6 0">
             <a-entity
+                id="cursor"
                 cursor
-                position="0 0 -0.02"
-                geometry="primitive: ring; radiusInner: 0.0002; radiusOuter: 0.0004"
+                position="0 0 -0.1"
+                geometry="primitive: ring; radiusInner: 0.001; radiusOuter: 0.002"
                 material="color: gray; shader: flat;">
             </a-entity>
             <a-entity

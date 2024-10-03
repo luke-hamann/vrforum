@@ -5,7 +5,6 @@ import pkg from 'nunjucks';
 const { render } = pkg;
 import Topic from './models/topic.js';
 import Database from './models/database.js';
-import DatabaseDummy from './models/databasedummy.js';
 
 const app = express();
 const port = 8001;
@@ -46,6 +45,20 @@ app.get('/topic/:topic_id/',
             internal_server_error(response);
         }
     );
+});
+
+app.get('/topic/:topic_id/post/',
+        (request: express.Request, response: express.Response): void => {
+    var topic_id = Number(request.params.topic_id);
+    var form_content = render('./views/forms/post.html', { topic_id });
+    response.send(form_content)
+});
+
+app.get('/post/:post_id/reply/',
+        (request: express.Request, response: express.Response): void => {
+    var post_id = Number(request.params.post_id);
+    var form_content = render('./views/forms/reply.html', { post_id });
+    response.send(form_content);
 });
 
 app.listen(port, () => {

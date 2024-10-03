@@ -1,0 +1,9 @@
+{% from './formelements.html' import input, label, backdrop %}
+
+<a-entity form>
+    {{ backdrop() }}
+    {{ input('hidden', 'post_id', post_id) }}
+    {{ label('Body', 0.5) }}
+    {{ input('text', 'body', '', 0.4) }}
+    {{ input('submit', y_offset=-0.4) }}
+</a-entity>
