@@ -16,17 +16,30 @@
 {% set house_door_height = 2 %}
 
 {% set app_title_height = 10 %}
+{% set app_title_font_width = 30 %}
+
+{% set house_title_height = 3 %}
+{% set house_title_font_width = 15 %}
 
 {% set house_row_x_offset =
     (
         ( house_width * topics.length ) +
         ( house_spacing * ( topics.length - 1 ) )
     )
-    / -2 + ( house_width / 2 )
+    / -2
+    + ( house_width / 2 )
 %}
 
 <a-entity position="{{ house_row_x_offset }} 0 0">
-    {{ text('app-title', 'center', 'black', 20, 'VR Forum', -house_row_x_offset, app_title_height, -row_depth) }}
+    {{ text(
+        class='app-title',
+        align='center',
+        color='black',
+        width=app_title_font_width,
+        value='VR Forum',
+        x=-house_row_x_offset,
+        y=app_title_height,
+        z=-row_depth) }}
     {% set x_offset = 0 %}
     {% for topic in topics %}
         <a-entity position="{{ x_offset }} 0 {{ - row_depth }}">
@@ -42,10 +55,18 @@
                 width="{{ house_door_width }}"
                 height="{{ house_door_height }}"
                 rotation="0 0 -90"
-                position="0 {{ house_door_height / 2}} 0.05"
+                position="0 {{ house_door_height / 2 }} 0.05"
                 link="href: /topic/{{ topic.id }}/">
             </a-plane>
-            {{ text('topic-title', 'center', 'black', 10, topic.name, 0, house_title_height, 0.1) }}
+            {{ text(
+                class='topic-title',
+                align='center',
+                color='black',
+                width=house_title_font_width,
+                value=topic.name,
+                x=0,
+                y=house_title_height,
+                z=0.1) }}
         </a-entity>
         {% set x_offset = x_offset + house_width + house_spacing %}
     {% endfor %}

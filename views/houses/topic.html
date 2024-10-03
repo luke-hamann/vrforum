@@ -3,53 +3,68 @@
         - topic: Topic
 #}
 
-{% set post_footprint_width = 2 %}
-{% set post_footprint_height = 2 %}
+{% from './macros.html' import backdrop, text %}
+
+{% set threads_z_offset_initial = -20 %}
 
 {% set corridor_width = 10 %}
+{% set thread_gap = 4 %}
 
-{% set thread_columns = 3 %}
+{% set post_footprint_width = 2 %}
+{% set post_footprint_depth = 2 %}
+{% set thread_columns = 5 %}
 {% set thread_padding = 2 %}
-{% set thread_gap = 2 %}
 
-{% set thread_carpet_width =
-    ( thread_columns * post_footprint_width ) +
-    ( thread_padding * 2 )
-%}
+{% set thread_content_width = thread_columns * post_footprint_width %}
+{% set thread_full_width = thread_content_width + 2 * thread_padding %}
 
-{% macro backdrop(class, color, width, height, x, y, z) %}
-<a-entity class="{{ class }}" position="{{ x }} {{ y }} {{ z }}">
-    <a-plane
-        color="{{ color }}"
-        height="{{ height }}"
-        width="{{ width }}">
-    </a-plane>
-    <a-plane
-        color="{{ color }}"
-        height="{{ height }}"
-        width="{{ width }}"
-        rotation="0 180 0">
-    </a-plane>
-</a-entity>
-{% endmacro %}
-
-<a-entity
-    data-type="topic"
-    data-id="{{ topic.id }}"
-    data-name="{{ topic.name }}"
-    position="0 0 -10">
-    <a-entity
-        position="0 5 0"
-        text="
-            align: center;
-            color: black;
-            width: 10;
-            value: {{ topic.name }};
-        ">
+<a-entity class="topic">
+    <a-entity class="wall">
+        <a-plane
+            color="red"
+            width="1000"
+            height="100"
+            position="0 50 0.1"
+            rotation="0 180 0">
+        </a-plane>
+        <a-plane
+            color="brown"
+            width="2"
+            height="3"
+            position="0 1.5 0.05"
+            rotation="0 180 0"
+            link="href: /">
+        </a-plane>
     </a-entity>
 
+    <a-entity
+        class="mailbox"
+        data-type="topic"
+        data-id="{{ topic.id }}"
+        data-name="{{ topic.name }}"
+        position="{{ corridor_width / 2 }} 0 {{ threads_z_offset_initial + 3 }}"
+        cursorlistener>
+        <a-box
+            color="brown"
+            width="0.5"
+            height="0.5"
+            depth="1"
+            position="0 1.2 0">
+        </a-box>
+        <a-box
+            color="brown"
+            width="0.25"
+            height="0.7"
+            depth="0.25"
+            position="0 0.6 0">
+        </a-box>
+        {{ text('new-post', 'center', 'black', 5, 'New Post', 0, 1.7, 0) }}
+    </a-entity>
+
+    {{ text('topic-name', 'center', 'black', 50, topic.name, 0, 10, threads_z_offset_initial) }}
+
     {% set left = true %}
-    {% set thread_z_offset = 0 %}
+    {% set thread_z_offset = threads_z_offset_initial - thread_full_width / 2 %}
     {% for thread in topic.threads %}
         {% if left %}
             {% set thread_x_offset = corridor_width / 2 %}
@@ -59,8 +74,8 @@
             {% set thread_y_rotation = 90 %}
         {% endif %}
 
-        {% set thread_carpet_height =
-            ( post_footprint_height * ( thread.replies.length + 1 ) ) +
+        {% set thread_carpet_depth =
+            ( post_footprint_depth * ( thread.replies.length + 1 ) ) +
             ( thread_padding * 2 )
         %}
 
@@ -71,73 +86,44 @@
             <a-plane
                 class="thread_carpet"
                 color="blue"
-                width="{{ thread_carpet_width }}"
-                height="{{ thread_carpet_height }}"
-                position="0 0.1 {{ - thread_carpet_height / 2 }}"
+                width="{{ thread_full_width }}"
+                height="{{ thread_carpet_depth }}"
+                position="0 0.1 {{ - thread_carpet_depth / 2 }}"
                 rotation="-90 0 0">
             </a-plane>
 
+            {% set x_offset = - thread_padding - post_footprint_width %}
+            {% set z_offset = - thread_padding - post_footprint_depth %}
             <a-entity
                 data-type="post"
                 data-id="{{ thread.post.id }}"
-                position="0 0 {{ - thread_padding - post_footprint_height }}"
+                position="{{ x_offset }} 0 {{ z_offset }}"
                 cursorlistener>
-
-                {{
-                    backdrop('post-backdrop', 'white', 1.5, 1.5, 0, 1.5, -0.01) 
-                }}
-
-                <a-entity class="post-title"
-                    position="0 2 0"
-                    text="color: black; value: {{ thread.post.title }};"
-                ></a-entity>
-
-                <a-entity class="post-date"
-                    position="0 1.8 0"
-                    text="color: black; value: {{ thread.post.date_time }};"
-                ></a-entity>
-
-                <a-entity class="post-body"
-                    position="0 1.5 0"
-                    text="color: black; value: {{ thread.post.body }}"
-                ></a-entity>
+                {{ backdrop('post-backdrop', 'white', 1.5, 1.5, 0, 1.5, -0.01) }}
+                {{ text('post-title', 'left', 'black', 1.5, thread.post.title, 0.25, 2, 0) }}
+                {{ text('post-details', 'left', 'black', 1, thread.post.date_time.toDateString() + '\n\n' + thread.post.body, 0, 1.7, 0) }}
             </a-entity>
 
-            {% set iterator = 1 %}
-            {% set reply_z_offset = - thread_padding - ( 2 * post_footprint_height ) %}
+            {% set i = 1 %}
+            {% set z_offset = - thread_padding - ( 2 * post_footprint_depth ) %}
             {% for reply in thread.replies %}
 
-                {% set reply_x_offset = post_footprint_width * (
-                    thread_columns - Math.abs( iterator % ( 2 * ( thread_columns - 1 ) ) - thread_columns + 1 )
-                ) - ( post_footprint_width * thread_columns / 2 ) %}
+                {% set a = thread_columns %}
+                {% set current_column = -Math.abs(i % (2 * a - 2) - a + 1) + a - 1 %}
+
+                {% set x_offset = (current_column * post_footprint_width) -
+                                  (thread_content_width / 2) +
+                                  (post_footprint_width / 2)
+                %}
 
                 <a-entity class="reply"
-                    position="{{ reply_x_offset }} 0 {{ reply_z_offset }}">
-
-                    {{
-                        backdrop('reply-backdrop', 'white', 1.5, 1.5, 0, 1.5 -0.01)
-                    }}
-
-                    <a-entity class="reply-post"
-                        position="0 2 0"
-                        text="
-                        color: black;
-                        value: {{ ['Re: ', thread.post.title] | join }}"
-                        >
-                    </a-entity>
-
-                    <a-entity class="reply-date"
-                        position="0 1.8 0"
-                        text="color: black; value: {{ reply.date_time }};"
-                    ></a-entity>
-
-                    <a-entity class="reply-body"
-                        position="0 1.5 0"
-                        text="color: black; value: {{ reply.body }}"
-                    ></a-entity>
+                    position="{{ x_offset }} 0 {{ z_offset }}">
+                    {{ backdrop('reply-backdrop', 'white', 1.5, 1.5, 0, 1.5 -0.01) }}
+                    {{ text('reply-title', 'left', 'black', 1.5, 'Re: ' + thread.post.title, 0.25, 2, 0) }}
+                    {{ text('reply-content', 'left', 'black', 1, reply.date_time.toDateString() + '\n\n' + reply.body, 0, 1.7, 0) }}
                 </a-entity>
-                {% set reply_count = reply_count + 1 %}
-                {% set reply_z_offset = reply_z_offset - post_footprint_height %}
+                {% set i = i + 1 %}
+                {% set z_offset = z_offset - post_footprint_depth %}
             {% endfor %}
 
         </a-entity>
