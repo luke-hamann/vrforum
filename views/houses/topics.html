@@ -3,6 +3,8 @@
         - topics: Topic[]
 #}
 
+{% from './macros.html' import text %}
+
 {% set row_depth = 10 %}
 
 {% set house_title_height = 3 %}
@@ -24,42 +26,27 @@
 %}
 
 <a-entity position="{{ house_row_x_offset }} 0 0">
-<a-entity
-    position="{{ -house_row_x_offset }} {{ app_title_height }} {{ -row_depth }}"
-    text="
-    align: center;
-    color: black;
-    value: VR Forum;
-    width: 20;
-    ">
-</a-entity>
-{% set x_offset = 0 %}
-{% for topic in topics %}
-    <a-entity position="{{ x_offset }} 0 {{ - row_depth }}">
-        <a-box
-            color="red"
-            width="{{ house_width }}"
-            height="{{ house_height }}"
-            depth="{{ house_depth }}"
-            position="0 {{ house_height / 2 }} {{ - house_depth / 2 }}">
-        </a-box>
-        <a-entity
-            position="0 {{ house_title_height }} 0.1"
-            text="
-                align: center;
-                color: black;
-                value: {{ topic.name }};
-                width: 10;">
+    {{ text('app-title', 'center', 'black', 20, 'VR Forum', -house_row_x_offset, app_title_height, -row_depth) }}
+    {% set x_offset = 0 %}
+    {% for topic in topics %}
+        <a-entity position="{{ x_offset }} 0 {{ - row_depth }}">
+            <a-box
+                color="red"
+                width="{{ house_width }}"
+                height="{{ house_height }}"
+                depth="{{ house_depth }}"
+                position="0 {{ house_height / 2 }} {{ - house_depth / 2 }}">
+            </a-box>
+            <a-plane
+                color="brown"
+                width="{{ house_door_width }}"
+                height="{{ house_door_height }}"
+                rotation="0 0 -90"
+                position="0 {{ house_door_height / 2}} 0.05"
+                link="href: /topic/{{ topic.id }}/">
+            </a-plane>
+            {{ text('topic-title', 'center', 'black', 10, topic.name, 0, house_title_height, 0.1) }}
         </a-entity>
-        <a-plane
-            color="brown"
-            width="{{ house_door_width }}"
-            height="{{ house_door_height }}"
-            rotation="0 0 -90"
-            position="0 {{ house_door_height / 2}} 0.05"
-            link="href: /topic/{{ topic.id }}/">
-        </a-plane>
-    </a-entity>
-    {% set x_offset = x_offset + house_width + house_spacing %}
-{% endfor %}
+        {% set x_offset = x_offset + house_width + house_spacing %}
+    {% endfor %}
 </a-entity>
