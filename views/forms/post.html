@@ -1,0 +1,14 @@
+{% from './input.html' import input %}
+
+<a-entity form>
+    <a-plane color="tan" width="1" height="1"></a-plane>
+    
+    <a-entity field="name: topic_id; value: {{ topic_id }}">
+    </a-entity>
+
+    {{ input('text', 'title', 'Title', 0.3) }}
+    {{ input('textarea', 'body', 'Body', 0.4) }}
+    
+    <a-entity input="submit">
+    </a-entity>
+</a-entity>
