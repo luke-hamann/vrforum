@@ -1,4 +1,4 @@
-{% from './formelements.html' import input, label, backdrop %}
+{% from './controls.html' import label, input, backdrop %}
 
 <a-entity form>
     {{ backdrop() }}
@@ -7,4 +7,5 @@
     {{ label('Body', 0.5) }}
     {{ input('text', 'body', '', 0.4) }}
     {{ input('submit', y_offset=-0.4) }}
+    {{ input('close', y_offset=-0.5) }}
 </a-entity>
