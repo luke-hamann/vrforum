@@ -90,7 +90,7 @@
             </a-plane>
 
             {% set x_offset = - thread_padding - post_footprint_width %}
-            {% set z_offset = - thread_padding - post_footprint_depth %}
+            {% set z_offset = - thread_padding - ( post_footprint_depth / 2 )%}
             <a-entity
                 position="{{ x_offset }} 0 {{ z_offset }}"
                 formlauncher="action: reply; id: {{ thread.post.id }};">
@@ -100,7 +100,7 @@
             </a-entity>
 
             {% set i = 1 %}
-            {% set z_offset = - thread_padding - ( 2 * post_footprint_depth ) %}
+            {% set z_offset = - thread_padding - ( 1.5 * post_footprint_depth ) %}
             {% for reply in thread.replies %}
 
                 {% set a = thread_columns %}
