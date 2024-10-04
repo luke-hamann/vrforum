@@ -131,7 +131,7 @@ export default class Database {
         return new Thread(post, replies);
     }
 
-    static async add_post(post: Post) {
+    static async add_post(post: Post): Promise<void> {
         const connection = await mysql.createConnection(this.config);
         await connection.query(`
             INSERT INTO posts (title, body, topic_id)
