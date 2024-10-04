@@ -43,14 +43,21 @@ AFRAME.registerComponent('form', {
         this.getSelectedInputComponent().focus();
     },
 
-    tab(): void {
+    tab(backwards: boolean): void {
         // Unfocus the originally selected component
         var selectedComponent = this.getSelectedInputComponent();
         selectedComponent.unfocus();
 
-        // Increment the selection index
-        this._selected++;
-        this._selected %= this._tab_order.length;
+        // Modify the selection index
+        if (backwards) {
+            this._selected--;
+            if (this._selected < 0) {
+                this._selected = this._tab_order.length - 1;
+            }
+        } else {
+            this._selected++;
+            this._selected %= this._tab_order.length;
+        }
 
         // Focus the newly selected component
         selectedComponent = this.getSelectedInputComponent();
@@ -70,7 +77,7 @@ AFRAME.registerComponent('form', {
 
         // Tab between focusable inputs
         if (event.key == 'Tab') {
-            form.tab();
+            form.tab(event.shiftKey);
             return;
         }
 
