@@ -72,18 +72,37 @@ AFRAME.registerComponent('form', {
         input_component.processKeyboardEvent(event);
     },
 
-    submit: function() {
-        var inputs = [...this.el.querySelectorAll('[input]')]
+    submit: async function() {
+        var inputs: Element[] = [...this.el.querySelectorAll('[input]')]
             .filter((elm) => elm.hasAttribute('name'));
         
-        var form_data = new Map();
-        for (var input of inputs) {
+        var payload = new URLSearchParams();
+        for (const input of inputs) {
             var name = input.getAttribute('name');
             var value = input.getAttribute('value');
-            form_data.set(name, value);
+            payload.set(name!, value!);
         }
 
-        console.log(form_data);
+        var response: Response;
+        try {
+            response = await fetch('/', {
+                method: 'POST',
+                body: payload
+            });
+        } catch {
+            return;
+        }
+
+        if (!response.ok) return;
+
+        var content: string;
+        try {
+            content = await response.text();
+        } catch {
+            return;
+        }
+
+        document.querySelector('.scene').innerHTML = content;
         this.remove();
     }
 });
