@@ -14,26 +14,53 @@ export default class Database {
         database: 'vrforum'
     };
 
-    static async get_topics_shallow(): Promise<Topic[]> {
+    static _query_result_to_topics(query_result: mysql.QueryResult): Topic[] {
+        var rows = query_result as {
+            id: number,
+            name: string
+        }[];
+
+        return rows.map((row) => new Topic(row.id, row.name, true, []));
+    }
+
+    static _query_result_to_posts(query_result: mysql.QueryResult): Post[] {
+        var rows = query_result as {
+            id: number,
+            title: string,
+            body: string,
+            topic_id: number,
+            date_time: string
+        }[];
+
+        return rows.map((row) => new Post(row.id, row.title, row.body,
+            row.topic_id, new Date(Date.parse(row.date_time))
+        ));
+    }
+
+    static _query_result_to_replies(query_result: mysql.QueryResult): Reply[] {
+        var rows = query_result as {
+            id: number,
+            post_id: number,
+            body: string,
+            date_time: string
+        }[];
+
+        return rows.map((row) => new Reply(row.id, row.post_id, row.body,
+            new Date(Date.parse(row.date_time))
+        ));
+    }
+
+    static async get_topics(): Promise<Topic[]> {
         var connection: mysql.Connection =
             await mysql.createConnection(this.config);
 
-        var [queryResult, _] = await connection.query(`
+        var [query_result, _] = await connection.query(`
             SELECT id, name
             FROM topics
             ORDER BY LOWER(name)
         `);
         
-        var topic_rows = queryResult as {
-            id: number,
-            name: string
-        }[];
-
-        var topics: Topic[] = topic_rows.map((row) => new Topic(
-            row.id, row.name, true, [])
-        );
-
-        return topics;
+        return this._query_result_to_topics(query_result);
     }
 
     static async get_topic(topic_id: number): Promise<Topic> {
@@ -41,44 +68,28 @@ export default class Database {
             await mysql.createConnection(this.config);
 
         // Get topic
-        var [queryResult, _] = await connection.query(`
+        var [query_result, _] = await connection.query(`
             SELECT id, name
             FROM topics
             WHERE id = ?
         `, [topic_id]);
 
-        var topic_rows = queryResult as {id: number, name: string}[];
-        var topic_row = topic_rows[0];
-        var topic = new Topic(topic_row.id, topic_row.name, false, []);
+        var topic = this._query_result_to_topics(query_result)[0];
 
         // Get posts
 
-        var [queryResult, _] = await connection.query(`
+        var [query_result, _] = await connection.query(`
             SELECT id, title, body, topic_id, date_time
             FROM posts
             WHERE topic_id = ?
             ORDER BY date_time
         `, [topic_id]);
 
-        var post_rows = queryResult as {
-            id: number,
-            title: string,
-            body: string,
-            topic_id: number,
-            date_time: string
-        }[];
-
-        var posts = post_rows.map(row => new Post(
-            row.id,
-            row.title,
-            row.body,
-            row.topic_id,
-            new Date(Date.parse(row.date_time))
-        ));
+        var posts = this._query_result_to_posts(query_result)
 
         // Get replies
 
-        var [queryResult, _] = await connection.query(`
+        var [query_result, _] = await connection.query(`
             SELECT r.id, r.post_id, r.body, r.date_time
             FROM posts p
                 JOIN replies r ON (p.id = r.post_id)
@@ -86,21 +97,11 @@ export default class Database {
             ORDER by r.post_id, r.date_time;
         `, [topic_id]);
 
-        var reply_rows = queryResult as {
-            id: number,
-            post_id: number,
-            body: string,
-            date_time: string
-        }[];
-
-        var replies = reply_rows.map((row) => new Reply(
-            row.id, row.post_id, row.body, new Date(Date.parse(row.date_time))
-        ));
+        var replies = this._query_result_to_replies(query_result);
 
         // Build Threads
-        var threads = posts.map((post) => new Thread(
-            post,
-            replies.filter((reply) => reply.post_id = post.id)
+        var threads = posts.map((post) => new Thread(post,
+            replies.filter((reply) => reply.post_id == post.id)
         ));
 
         topic.threads = threads;
@@ -108,86 +109,26 @@ export default class Database {
         return topic;
     }
 
-    static async get_topics(): Promise<Topic[]> {
-        var connection: mysql.Connection;
-        var queryResult: mysql.QueryResult;
-        var all_posts: Post[];
-        var all_replies: Reply[];
-        var threads: Thread[];
-        var topics: Topic[];
+    static async get_thread(post_id: number): Promise<Thread> {
+        const connection = await mysql.createConnection(this.config);
 
-        connection =
-            await mysql.createConnection(this.config);
-
-        // Get all posts
-        [queryResult, _] = await connection.query(`
+        var [query_result, _] = await connection.query(`
             SELECT id, title, body, topic_id, date_time
             FROM posts
-            ORDER BY date_time;
-        `);
+            WHERE id = ?
+        `, [post_id]);
 
-        var post_rows = queryResult as {
-            id: number,
-            title: string,
-            body: string,
-            topic_id: number,
-            date_time: string
-        }[];
+        var post = this._query_result_to_posts(query_result)[0];
 
-        all_posts = post_rows.map(row => new Post(
-            row.id,
-            row.title,
-            row.body,
-            row.topic_id,
-            new Date(Date.parse(row.date_time))
-        ));
-
-        // Get all replies
-        var [queryResult, _] = await connection.query(`
+        var [query_result, _] = await connection.query(`
             SELECT id, post_id, body, date_time
             FROM replies
-            ORDER BY date_time;
-        `);
+            WHERE post_id = ?
+        `, [post_id]);
 
-        var reply_rows = queryResult as {
-            id: number,
-            post_id: number,
-            body: string,
-            date_time: string
-        }[];
+        var replies = this._query_result_to_replies(query_result);
 
-        all_replies = reply_rows.map(row => new Reply(
-            row.id,
-            row.post_id,
-            row.body,
-            new Date(Date.parse(row.date_time))
-        ));
-
-        // Generate threads based on posts and replies
-        threads = all_posts.map((post) => new Thread(
-            post,
-            all_replies.filter((reply) => (reply.post_id == post.id))
-        ));
-
-        // Get all topics
-        var [queryResult, _] = await connection.query(`
-            SELECT id, name
-            FROM topics
-            ORDER BY id;
-        `);
-
-        var topic_rows = queryResult as {
-            id: number,
-            name: string
-        }[];
-
-        var topics: Topic[] = topic_rows.map((row) =>
-            new Topic(row.id, row.name, false,
-                threads.filter((thread) => (thread.post.topic_id == row.id))
-            )
-        );
-
-        return topics;
+        return new Thread(post, replies);
     }
 
     static async add_post(post: Post) {
