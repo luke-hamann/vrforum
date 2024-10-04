@@ -5,9 +5,10 @@ export default class Post {
     title: string;
     body: string;
     topic_id: number;
-    date_time: Date;
+    date_time: Date | null;
     
-    constructor(id: number, title: string, body: string, topic_id: number, date_time: Date) {
+    constructor(id: number = 0, title: string = '', body: string = '',
+                topic_id: number = 0, date_time: Date | null = null) {
         this.id = id;
         this.title = title;
         this.body = body;
