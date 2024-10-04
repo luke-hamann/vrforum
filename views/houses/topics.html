@@ -5,21 +5,20 @@
 
 {% from './macros.html' import text %}
 
-{% set row_depth = 10 %}
-
-{% set house_title_height = 3 %}
-{% set house_width = 5 %}
-{% set house_height = 5 %}
-{% set house_depth = 5 %}
-{% set house_spacing = 10 %}
-{% set house_door_width = 3 %}
-{% set house_door_height = 2 %}
-
-{% set app_title_height = 10 %}
-{% set app_title_font_width = 30 %}
-
-{% set house_title_height = 3 %}
-{% set house_title_font_width = 15 %}
+{% from './_globals.html' import
+    topics_row_depth,
+    house_title_height,
+    house_width,
+    house_height,
+    house_depth,
+    house_spacing,
+    house_door_width,
+    house_door_height,
+    app_title_height,
+    app_title_font_width,
+    house_title_height,
+    house_title_font_width
+%}
 
 {% set house_row_x_offset =
     (
@@ -39,10 +38,10 @@
         value='VR Forum',
         x=-house_row_x_offset,
         y=app_title_height,
-        z=-row_depth) }}
+        z=-topics_row_depth) }}
     {% set x_offset = 0 %}
     {% for topic in topics %}
-        <a-entity position="{{ x_offset }} 0 {{ - row_depth }}">
+        <a-entity position="{{ x_offset }} 0 {{ - topics_row_depth }}">
             <a-box
                 color="red"
                 width="{{ house_width }}"

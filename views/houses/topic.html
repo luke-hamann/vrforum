@@ -5,18 +5,12 @@
 
 {% from './macros.html' import backdrop, text %}
 
-{% set threads_z_offset_initial = -20 %}
-
-{% set corridor_width = 10 %}
-{% set thread_gap = 4 %}
-
-{% set post_footprint_width = 2 %}
-{% set post_footprint_depth = 2 %}
-{% set thread_columns = 5 %}
-{% set thread_padding = 2 %}
-
-{% set thread_content_width = thread_columns * post_footprint_width %}
-{% set thread_full_width = thread_content_width + 2 * thread_padding %}
+{% from './_globals.html' import
+    topic_z_offset_initial,
+    topic_corridor_width,
+    topic_thread_gap,
+    thread_full_width
+%}
 
 <a-entity class="topic">
     <a-entity class="wall">
@@ -39,8 +33,8 @@
 
     <a-entity
         class="mailbox"
-        position="{{ corridor_width / 2 }} 0 {{ threads_z_offset_initial + 3 }}"
-        formlauncher="action: post; id: {{ topic.id }}; name: {{ topic.name}};">
+        position="{{ topic_corridor_width / 2 }} 0 {{ topic_z_offset_initial + 2 }}"
+        formlauncher="action: post; id: {{ topic.id }}; name: {{ topic.name }};">
         <a-box
             color="brown"
             width="0.5"
@@ -58,78 +52,31 @@
         {{ text('new-post', 'center', 'black', 5, 'New Post', 0, 1.7, 0) }}
     </a-entity>
 
-    {{ text('topic-name', 'center', 'black', 50, topic.name, 0, 10, threads_z_offset_initial) }}
+    {{ text('topic-name', 'center', 'black', 50, topic.name, 0, 10,
+        topic_z_offset_initial) }}
 
     {% set left = true %}
-    {% set thread_z_offset = threads_z_offset_initial - thread_full_width / 2 %}
+    {% set thread_z_offset = topic_z_offset_initial - thread_full_width / 2 %}
     {% for thread in topic.threads %}
         {% if left %}
-            {% set thread_x_offset = corridor_width / 2 %}
+            {% set thread_x_offset = topic_corridor_width / 2 %}
             {% set thread_y_rotation = -90 %}
         {% else %}
-            {% set thread_x_offset = corridor_width / -2 %}
+            {% set thread_x_offset = topic_corridor_width / -2 %}
             {% set thread_y_rotation = 90 %}
         {% endif %}
 
-        {% set thread_carpet_depth =
-            ( post_footprint_depth * ( thread.replies.length + 1 ) ) +
-            ( thread_padding * 2 )
-        %}
-
-        <a-entity class="thread"
+        <a-entity
             position="{{ thread_x_offset }} 0 {{ thread_z_offset }}"
             rotation="0 {{ thread_y_rotation }} 0">
-
-            <a-plane
-                class="thread_carpet"
-                color="blue"
-                width="{{ thread_full_width }}"
-                height="{{ thread_carpet_depth }}"
-                position="0 0.1 {{ - thread_carpet_depth / 2 }}"
-                rotation="-90 0 0">
-            </a-plane>
-
-            {% set x_offset = - thread_padding - post_footprint_width %}
-            {% set z_offset = - thread_padding - ( post_footprint_depth / 2 )%}
-            <a-entity
-                position="{{ x_offset }} 0 {{ z_offset }}"
-                formlauncher="action: reply; id: {{ thread.post.id }};">
-                {{ backdrop('post-backdrop', 'white', 1.5, 1.5, 0, 1.5, -0.01) }}
-                {{ text('post-title', 'left', 'black', 1.5, thread.post.title, 0.25, 2, 0) }}
-                {{ text('post-details', 'left', 'black', 1, thread.post.date_time.toDateString() + '\n\n' + thread.post.body, 0, 1.7, 0) }}
-            </a-entity>
-
-            {% set i = 1 %}
-            {% set z_offset = - thread_padding - ( 1.5 * post_footprint_depth ) %}
-            {% for reply in thread.replies %}
-
-                {% set a = thread_columns %}
-                {% set current_column = -Math.abs(i % (2 * a - 2) - a + 1) + a - 1 %}
-
-                {% set x_offset = (current_column * post_footprint_width) -
-                                  (thread_content_width / 2) +
-                                  (post_footprint_width / 2)
-                %}
-
-                <a-entity class="reply"
-                    position="{{ x_offset }} 0 {{ z_offset }}">
-                    {{ backdrop('reply-backdrop', 'white', 1.5, 1.5, 0, 1.5 -0.01) }}
-                    {{ text('reply-title', 'left', 'black', 1.5, 'Re: ' + thread.post.title, 0.25, 2, 0) }}
-                    {{ text('reply-content', 'left', 'black', 1, reply.date_time.toDateString() + '\n\n' + reply.body, 0, 1.7, 0) }}
-                </a-entity>
-                {% set i = i + 1 %}
-                {% set z_offset = z_offset - post_footprint_depth %}
-            {% endfor %}
-
+            {% include './thread.html' %}
         </a-entity>
 
         {% if left %}
             {% set left = false %}
         {% else %}
             {% set left = true %}
-            {% set thread_z_delta = thread_gap +
-                                    ( 2 * thread_padding ) +
-                                    ( thread_columns * post_footprint_width ) %}
+            {% set thread_z_delta = topic_thread_gap + thread_full_width %}
             {% set thread_z_offset = thread_z_offset - thread_z_delta %}
         {% endif %}
     {% endfor %}
