@@ -3,6 +3,7 @@
 AFRAME.registerComponent('input', {
     _allowed_characters: [] as string[],
     _isFocused: false,
+    _insertionPoint: 0,
 
     init: function(): void {
         var chars = 'abcdefghijklmnopqrstuvwxyz';
@@ -11,7 +12,22 @@ AFRAME.registerComponent('input', {
         if (this._isTypeTextArea()) chars += '\n';
 
         this._allowed_characters = chars.split('')
-        this._updateTextRendering();
+    },
+
+    focus(): void {
+        this._isFocused = true;
+    },
+
+    unfocus(): void {
+        this._isFocused = false;
+    },
+
+    _getValue(): string {
+        return this.el.getAttribute('value');
+    },
+
+    _setValue(value: string): void {
+        this.el.setAttribute('value', value);
     },
 
     _getType(): string {
@@ -38,7 +54,34 @@ AFRAME.registerComponent('input', {
         return (this.el.getAttribute('type') === 'hidden');
     },
 
+    _insertText(original: string, text: string, position: number): string {
+        return original.slice(0, position) + text + original.slice(position);
+    },
+
     _setDisplayText(text: string) {
+
+    },
+
+    tick: function(time: number, timeDelta: number): void
+    {
+        if (this._isTypeHidden()) return;
+
+        var text: string = '';
+        if (this._isTypeSubmit()) {
+            var text = '[ Submit ]';
+            if (this._isFocused) text = text.toUpperCase();
+        } else if (this._isTypeClose()) {
+            var text = '[ Close ]';
+            if (this._isFocused) text = text.toUpperCase();
+        } else if (this._isTypeText() || this._isTypeTextArea()) {
+            var text = this._getValue();
+            if (this._isFocused) {
+                var cursor = (time % 800 < 400) ? '|' : ' ';
+
+                var text = this._insertText(text, cursor, this._insertionPoint);
+            }
+        }
+
         this.el.setAttribute('text', {
             baseline: 'top',
             color: 'black',
@@ -46,49 +89,9 @@ AFRAME.registerComponent('input', {
         });
     },
 
-    _updateTextRendering: function(): void
-    {
-        if (this._isTypeHidden()) return;
-
-        if (this._isTypeSubmit())
-        {
-            var text = '[ Submit ]';
-            if (this._isFocused) text = text.toUpperCase();
-            this._setDisplayText(text);
-        }
-        else if (this._isTypeClose())
-        {
-            var text = '[ Close ]';
-            if (this._isFocused) text = text.toUpperCase();
-            this._setDisplayText(text);
-        }
-        else if (this._isTypeText() || this._isTypeTextArea())
-        {
-            var value = this.el.getAttribute('value');
-            this._setDisplayText(value);
-        }
-    },
-
-    focus(): void {
-        this._isFocused = true;
-    },
-
-    unfocus(): void {
-        this._isFocused = false;
-    },
-
     processKeyboardEvent: function(event: KeyboardEvent): void {
         var key = event.key;
-
-        if (this._isTypeText() || this._isTypeTextArea()) {
-            if (key == 'Enter') key = '\n';
-
-            if (this._allowed_characters.includes(key)) {
-                var value = this.el.getAttribute('value');
-                this.el.setAttribute('value', value + key);
-                this._updateTextRendering();
-            }
-        } else if (this._isTypeSubmit()) {
+        if (this._isTypeSubmit()) {
             if (key == 'Enter') {
                 document.querySelector('[form]').components.form.submit();
             }
@@ -96,8 +99,28 @@ AFRAME.registerComponent('input', {
             if (key == 'Enter') {
                 document.querySelector('[form]').components.form.remove();
             }
+        } else if (this._isTypeText() || this._isTypeTextArea()) {
+            var currentValue = this.el.getAttribute('value');
+
+            if (key == 'Enter') key = '\n';
+
+            if (this._allowed_characters.includes(key)) {
+                var value = this._insertText(currentValue, key, this._insertionPoint);
+                this._setValue(value);
+                this._insertionPoint++;
+            } else if (key == 'Backspace') {
+                if (this._insertionPoint > 0) {
+                    var value = this._getValue();
+                    value = value.substring(0, this._insertionPoint - 1) +
+                        value.substring(this._insertionPoint);
+                    this._setValue(value);
+                    this._insertionPoint--;
+                }
+            } else if (key == 'ArrowLeft') {
+                this._insertionPoint = Math.max(0, this._insertionPoint - 1);
+            } else if (key == 'ArrowRight') {
+                this._insertionPoint = Math.min(this._getValue().length, this._insertionPoint + 1);
+            }
         }
     }
-
-
 });

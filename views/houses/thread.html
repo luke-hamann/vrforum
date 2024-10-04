@@ -3,6 +3,8 @@
         - thread: Thread
 #}
 
+{% from './macros.html' import backdrop, text %}
+
 {% from './_globals.html' import
     thread_post_footprint_width,
     thread_post_footprint_depth,
@@ -34,7 +36,10 @@
         formlauncher="action: reply; id: {{ thread.post.id }};">
         {{ backdrop('post-backdrop', 'white', 1.5, 1.5, 0, 1.5, -0.01) }}
         {{ text('post-title', 'left', 'black', 1.5, thread.post.title, 0.25, 2, 0) }}
-        {{ text('post-details', 'left', 'black', 1, thread.post.date_time.toDateString() + '\n\n' + thread.post.body, 0, 1.7, 0) }}
+
+        {% set post_details = thread.post.date_time.toDateString() + '\n\n' +
+            thread.post.body %}
+        {{ text('post-details', 'left', 'black', 1, post_details, 0, 1.7, 0) }}
     </a-entity>
 
     {% set i = 1 %}

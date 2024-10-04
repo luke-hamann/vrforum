@@ -44,10 +44,17 @@ AFRAME.registerComponent('form', {
     },
 
     tab(): void {
-        this.getSelectedInputComponent().unfocus();
+        // Unfocus the originally selected component
+        var selectedComponent = this.getSelectedInputComponent();
+        selectedComponent.unfocus();
+
+        // Increment the selection index
         this._selected++;
         this._selected %= this._tab_order.length;
-        this.getSelectedInputComponent().focus();
+
+        // Focus the newly selected component
+        selectedComponent = this.getSelectedInputComponent();
+        selectedComponent.focus();
     },
 
     getSelectedInputComponent(): any {
@@ -102,7 +109,15 @@ AFRAME.registerComponent('form', {
             return;
         }
 
-        document.querySelector('.scene').innerHTML = content;
+        if (payload.get('action') == 'post') {
+            var scene = document.querySelector('.scene');
+            scene.innerHTML = content;
+        } else if (payload.get('action') == 'reply') {
+            var post_id = payload.get('post_id');
+            var thread = document.querySelector(`[thread-post-id="${post_id}"]`);
+            thread.innerHTML = content;
+        }
+
         this.remove();
     }
 });

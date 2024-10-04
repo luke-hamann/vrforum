@@ -11,7 +11,7 @@ import Database from './models/database.js';
 const app = express();
 const port = 8001;
 
-// 
+// Reading url-encoded post data
 app.use(express.urlencoded({extended:true}));
 
 // Static files
@@ -52,8 +52,11 @@ app.post('/', (request: express.Request, response: express.Response): void => {
         var post_id = Number(request.body.post_id);
         var body = request.body.body;
         var reply = new Reply(0, post_id, body, null);
-        Database.add_reply(reply);
-        response.status(500).send('');
+        Database.add_reply(reply)
+        .then(() => Database.get_thread(post_id))
+        .then((thread) => {
+            response.send(render('./views/houses/thread.html', { thread, Math }));
+        });
     }
 });
 
@@ -86,12 +89,6 @@ app.get('/post/:post_id/reply/',
     var form_content = render('./views/forms/reply.html', { post_id });
     response.send(form_content);
 });
-
-app.post('/submit/',
-        (request: express.Request, response: express.Response): void => {
-    console.log(request.body);
-    response.send('');
-})
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);

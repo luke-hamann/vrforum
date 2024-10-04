@@ -5,6 +5,7 @@
   "main": "built/server/controller.js",
   "type": "module",
   "scripts": {
+    "watch": "tsc --watch",
     "build": "tsc",
     "serve": "node ./build/server/index.js"
   },
