@@ -43,7 +43,10 @@
     {% for topic in topics %}
         <a-entity
             topic-id="{{ topic.id }}"
-            position="{{ x_offset }} 0 {{ - topics_row_depth }}">
+            position="{{ x_offset }} 0 {{ -topics_row_depth }}"
+            {# I need a better way of getting absolute world position: #}
+            absolute-x="{{ house_row_x_offset + x_offset }}"
+            absolute-z="{{ -topics_row_depth }}">
             <a-box
                 color="red"
                 width="{{ house_width }}"
