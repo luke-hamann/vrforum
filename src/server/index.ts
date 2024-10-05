@@ -23,13 +23,17 @@ function internal_server_error(response: express.Response): void {
     response.status(500).send('<h1>500</h1><p>Something went wrong.</p>');
 }
 
-app.get('/', (_: express.Request, response: express.Response): void => {
+app.get('/', (request: express.Request, response: express.Response): void => {
     Database.get_topics()
     .then(
         (topics: Topic[]) => {
-            var content: string = render('./views/houses/topics.html', { topics });
-            var page: string = render('./views/houses/index.html', { content });
-            response.send(page);
+            var content: string = render('./views/houses/topics.html', { topics, Math });
+
+            if (request.get('Refresh') == undefined) {
+                content = render('./views/houses/index.html', { content });
+            }
+
+            response.send(content);
         },
         () => {
             internal_server_error(response);
@@ -67,8 +71,12 @@ app.get('/topic/:topic_id/',
     .then(
         (topic: Topic) => {
             var content: string = render('./views/houses/topic.html', { topic , Math });
-            var page: string = render('./views/houses/index.html', { content });
-            response.send(page);
+
+            if (request.get('Refresh') == undefined) {
+                content = render('./views/houses/index.html', { content });
+            }
+
+            response.send(content);
         },
         () => {
             internal_server_error(response);

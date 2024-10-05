@@ -41,7 +41,9 @@
         z=-topics_row_depth) }}
     {% set x_offset = 0 %}
     {% for topic in topics %}
-        <a-entity position="{{ x_offset }} 0 {{ - topics_row_depth }}">
+        <a-entity
+            topic-id="{{ topic.id }}"
+            position="{{ x_offset }} 0 {{ - topics_row_depth }}">
             <a-box
                 color="red"
                 width="{{ house_width }}"

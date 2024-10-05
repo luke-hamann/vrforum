@@ -6,6 +6,7 @@
 {% from './macros.html' import backdrop, text %}
 
 {% from './_globals.html' import
+    topic_wall_z_offset,
     topic_z_offset_initial,
     topic_corridor_width,
     topic_thread_gap,
@@ -18,14 +19,14 @@
             color="red"
             width="1000"
             height="100"
-            position="0 50 0.1"
+            position="0 50 {{ topic_wall_z_offset }}"
             rotation="0 180 0">
         </a-plane>
         <a-plane
             color="brown"
             width="2"
             height="3"
-            position="0 1.5 0.05"
+            position="0 1.5 {{ topic_wall_z_offset - 0.05 }}"
             rotation="0 180 0"
             link="href: /">
         </a-plane>
