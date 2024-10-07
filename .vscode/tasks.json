@@ -10,7 +10,7 @@
             },
             "problemMatcher": [],
             "label": "npm: build",
-            "detail": "rmdir /s /q .\\build && tsc"
+            "detail": "tsc"
         }
     ]
 }
