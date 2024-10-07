@@ -2,10 +2,12 @@
   "name": "vrforum",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "built/server/controller.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "tsc --watch",
+    "build": "tsc",
+    "serve": "node ./build/server/index.js"
   },
   "repository": {
     "type": "git",
@@ -21,5 +23,11 @@
     "express": "^4.21.0",
     "mysql2": "^3.11.3",
     "nunjucks": "^3.2.4"
+  },
+  "devDependencies": {
+    "@types/aframe": "^1.2.7",
+    "@types/express": "^5.0.0",
+    "@types/nunjucks": "^3.2.6",
+    "typescript": "^5.6.2"
   }
 }

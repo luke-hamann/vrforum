@@ -1,0 +1,29 @@
+{% macro text(class, align, color, width, value, x, y, z) %}
+<a-entity
+    class="{{ class }}"
+    position="{{ x }} {{ y }} {{ z }}"
+    text="
+        align: {{ align }};
+        baseline: top;
+        color: {{ color }};
+        width: {{ width }};
+        value: {{ value }};
+    ">
+</a-entity>
+{% endmacro %}
+
+{% macro backdrop(class, color, width, height, x, y, z) %}
+<a-entity class="{{ class }}" position="{{ x }} {{ y }} {{ z }}">
+    <a-plane
+        color="{{ color }}"
+        height="{{ height }}"
+        width="{{ width }}">
+    </a-plane>
+    <a-plane
+        color="{{ color }}"
+        height="{{ height }}"
+        width="{{ width }}"
+        rotation="0 180 0">
+    </a-plane>
+</a-entity>
+{% endmacro %}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <meta charset="utf-8" />
+    <title>VR Forum</title>
+    <script src="/lib/aframe.min.js"></script>
+    <script type="module" src="/js/components/formlauncher.js"></script>
+    <script type="module" src="/js/components/input.js"></script>
+    <script type="module" src="/js/components/form.js"></script>
+    <script type="module" src="/js/systems/teleporter.js"></script>
+</head>
+
+<body>
+    <a-scene keyboard-shortcuts="enterVR: false">
+        <a-entity
+            camera
+            look-controls="pointerLockEnabled: true;"
+            wasd-controls
+            position="0 1.6 0">
+            <a-entity
+                id="cursor"
+                cursor
+                position="0 0 -0.1"
+                geometry="primitive: ring; radiusInner: 0.001; radiusOuter: 0.002"
+                material="color: gray; shader: flat;">
+            </a-entity>
+            <a-entity
+                formmount
+                position="0 0 -0.01"
+                scale="0.01 0.01 0.01"
+                material="shader: flat;">
+            </a-entity>
+        </a-entity>
+        <a-sky color="#87CEEB"></a-sky>
+        <a-plane color="#90ee90" height="1000" width="1000" position="0 -0.1 0"
+            rotation="-90 0 0"></a-plane>
+        <a-entity class="scene">
+            {{ content | safe }}
+        </a-entity>
+    </a-scene>
+</body>
+
+</html>

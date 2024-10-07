@@ -1,0 +1,83 @@
+{#
+    Parameters:
+        - topic: Topic
+#}
+
+{% from './macros.html' import backdrop, text %}
+
+{% from './_globals.html' import
+    topic_z_offset_initial,
+    topic_corridor_width,
+    topic_thread_gap,
+    thread_full_width
+%}
+
+<a-entity class="topic">
+    <a-entity class="wall">
+        <a-plane
+            color="red"
+            width="1000"
+            height="100"
+            position="0 50 0"
+            rotation="0 180 0">
+        </a-plane>
+        <a-plane
+            color="brown"
+            width="2"
+            height="3"
+            position="0 1.5 -0.05"
+            rotation="0 180 0"
+            link="href: /">
+        </a-plane>
+    </a-entity>
+
+    <a-entity
+        class="mailbox"
+        position="{{ topic_corridor_width / 2 }} 0 {{ topic_z_offset_initial + 2 }}"
+        formlauncher="action: post; id: {{ topic.id }}; name: {{ topic.name }};">
+        <a-box
+            color="brown"
+            width="0.5"
+            height="0.5"
+            depth="1"
+            position="0 1.2 0">
+        </a-box>
+        <a-box
+            color="brown"
+            width="0.25"
+            height="0.7"
+            depth="0.25"
+            position="0 0.6 0">
+        </a-box>
+        {{ text('new-post', 'center', 'black', 5, 'New Post', 0, 1.7, 0) }}
+    </a-entity>
+
+    {{ text('topic-name', 'center', 'black', 50, topic.name, 0, 10,
+        topic_z_offset_initial) }}
+
+    {% set left = true %}
+    {% set thread_z_offset = topic_z_offset_initial - thread_full_width / 2 %}
+    {% for thread in topic.threads %}
+        {% if left %}
+            {% set thread_x_offset = topic_corridor_width / 2 %}
+            {% set thread_y_rotation = -90 %}
+        {% else %}
+            {% set thread_x_offset = topic_corridor_width / -2 %}
+            {% set thread_y_rotation = 90 %}
+        {% endif %}
+
+        <a-entity
+            position="{{ thread_x_offset }} 0 {{ thread_z_offset }}"
+            rotation="0 {{ thread_y_rotation }} 0">
+            {% include './thread.html' %}
+        </a-entity>
+
+        {% if left %}
+            {% set left = false %}
+        {% else %}
+            {% set left = true %}
+            {% set thread_z_delta = topic_thread_gap + thread_full_width %}
+            {% set thread_z_offset = thread_z_offset - thread_z_delta %}
+        {% endif %}
+    {% endfor %}
+</a-entity>
