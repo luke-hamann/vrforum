@@ -56,7 +56,8 @@
         %}
 
         <a-entity class="reply"
-            position="{{ x_offset }} 0 {{ z_offset }}">
+            position="{{ x_offset }} 0 {{ z_offset }}"
+            formlauncher="action: reply; id: {{ thread.post.id }};">
             {% set title = 'Re: ' + thread.post.title %}
             {% set content = reply.date_time.toDateString() + '\n\n' +
                 reply.body %}
