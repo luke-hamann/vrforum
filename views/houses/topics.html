@@ -54,18 +54,47 @@
                 depth="{{ house_depth }}"
                 position="0 {{ house_height / 2 }} {{ - house_depth / 2 }}">
             </a-box>
-            <a-triangle
-                color="yellow"
-                vertex-a="{{ -house_width / 2 }} {{ house_height }} 0"
-                vertex-b="{{ house_width / 2 }} {{ house_height }} 0"
-                vertex-c="0 {{ house_height + house_roof_height }} 0">
-            </a-triangle>
-            <a-triangle
-                color="yellow"
-                vertex-a="{{ house_width / 2 }} {{ house_height }} {{ -house_depth }}"
-                vertex-b="{{ -house_width / 2 }} {{ house_height }} {{ -house_depth}}"
-                vertex-c="0 {{ house_height + house_roof_height }} {{ -house_depth }}">
-            </a-triangle>
+            <a-entity
+                class="roof"
+                position="0 {{ house_height }} 0"
+                scale="{{ house_width }} {{ house_roof_height }} {{ house_depth }}">
+                <a-triangle
+                    color="yellow"
+                    vertex-a="-0.5 0 0"
+                    vertex-b="0.5 0 0"
+                    vertex-c="0 1 0">
+                </a-triangle>
+                <a-triangle
+                    color="yellow"
+                    vertex-a="0.5 0 -1"
+                    vertex-b="-0.5 0 -1"
+                    vertex-c="0 1 -1">
+                </a-triangle>
+                <a-triangle
+                    color="yellow"
+                    vertex-a="-0.5 0 -1"
+                    vertex-b="-0.5 0 0"
+                    vertex-c="0 1 0">
+                </a-triangle>
+                <a-triangle
+                    color="yellow"
+                    vertex-a="0 1 -1"
+                    vertex-b="-0.5 0 -1"
+                    vertex-c="0 1 0">
+                </a-triangle>
+                <a-triangle
+                    color="yellow"
+                    vertex-a="0.5 0 -1"
+                    vertex-b="0 1 0"
+                    vertex-c="0.5 0 0">
+                </a-triangle>
+                <a-triangle
+                    color="yellow"
+                    vertex-a="0 1 -1"
+                    vertex-b="0 1 0"
+                    vertex-c="0.5 0 -1">
+                </a-triangle>
+            </a-entity>
             <a-plane
                 color="brown"
                 width="{{ house_door_width }}"
