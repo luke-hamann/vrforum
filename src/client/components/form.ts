@@ -30,6 +30,7 @@ AFRAME.registerComponent('form', {
     },
 
     _updateInputs: function(): void {
+        // Construct the form's list of inputs and tab order
         this._inputs = [...this.el.querySelectorAll('[input]')];
         this._tab_order = [];
         for (var i = 0; i < this._inputs.length; i++) {
@@ -39,6 +40,8 @@ AFRAME.registerComponent('form', {
                 this._tab_order.push(i);
             }
         }
+
+        // Focus the first focusable input on the form
         this._selected = 0;
         this.getSelectedInputComponent().focus();
     },
@@ -65,14 +68,17 @@ AFRAME.registerComponent('form', {
     },
 
     getSelectedInputComponent(): any {
-        var index = this._tab_order[this._selected];
-        var component = (this._inputs[index] as any).components.input;
+        // Get the A-Frame input component cooresponding to the selected input
+        var index: number = this._tab_order[this._selected];
+        var element: Element = this._inputs[index];
+        var component = (element as any).components.input;
         return component;
     },
 
     _processKeyboardEvent: function(event: KeyboardEvent): void {
         event.preventDefault();
 
+        // Get the form component
         var form = document.querySelector('[form]').components.form;
 
         // Tab between focusable inputs
@@ -87,9 +93,11 @@ AFRAME.registerComponent('form', {
     },
 
     submit: async function() {
+        // Get all the inputs with name attributes
         var inputs: Element[] = [...this.el.querySelectorAll('[input]')]
             .filter((elm) => elm.hasAttribute('name'));
         
+        // Construct a payload to send to the server based on the form inputs
         var payload = new URLSearchParams();
         for (const input of inputs) {
             var name = input.getAttribute('name');
@@ -97,6 +105,7 @@ AFRAME.registerComponent('form', {
             payload.set(name!, value!);
         }
 
+        // POST the payload to the server
         var response: Response;
         try {
             response = await fetch('/', {
@@ -109,6 +118,7 @@ AFRAME.registerComponent('form', {
 
         if (!response.ok) return;
 
+        // Get the server's response
         var content: string;
         try {
             content = await response.text();
@@ -116,6 +126,7 @@ AFRAME.registerComponent('form', {
             return;
         }
 
+        // Hot-swap the relevant piece of the DOM based on the action taken
         if (payload.get('action') == 'post') {
             var scene = document.querySelector('.scene');
             scene.innerHTML = content;
@@ -125,6 +136,7 @@ AFRAME.registerComponent('form', {
             thread.innerHTML = content;
         }
 
+        // Delete the form element after sucessful submission
         this.remove();
     }
 });
