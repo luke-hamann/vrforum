@@ -55,7 +55,7 @@ AFRAME.registerComponent('form', {
             if (this._tabOrderIndex < 0) {
                 this._tabOrderIndex = this._tabOrder.length - 1;
             }
-        // If the user tabs forwards, increment the tab order index
+        // If the user tabs forward, increment the tab order index
         } else {
             this._tabOrderIndex++;
             this._tabOrderIndex %= this._tabOrder.length;
@@ -86,8 +86,8 @@ AFRAME.registerComponent('form', {
             form.tab(event.shiftKey);
         // Otherwise, forward the keyboard event to the selected input
         } else {
-            var input_component = form.getSelectedInputComponent();
-            input_component.processKeyboardEvent(event);
+            var inputComponent = form.getSelectedInputComponent();
+            inputComponent.processKeyboardEvent(event);
         }
     },
 
