@@ -108,6 +108,7 @@ AFRAME.registerSystem('teleporter', {
 
         // If the user may be teleporting from a topic page to the Topics page
         } else if (this._currentPage == CurrentPage.Topic) {
+            // If the user entered the topic exit wall
             if (this._getPlayerPosition().z <= 0) return;
 
             this._isLocked = true;
