@@ -5,7 +5,7 @@ enum CurrentPage {
     Topic
 }
 
-AFRAME.registerSystem('controller', {
+AFRAME.registerSystem('teleporter', {
     _current_page: CurrentPage.Topics,
     _current_topic_id: -1,
     _player: document.querySelector('[camera]'),
@@ -80,9 +80,7 @@ AFRAME.registerSystem('controller', {
 
             this._locked = true;
             var url = `/topic/${this._current_topic_id}/`;
-            fetch(url, {
-                headers: { 'Refresh': '' }
-            })
+            fetch(url, { headers: { 'Refresh': '' }})
             .then((response) => response.text())
             .then((text) => {
                 this._scene.innerHTML = text;
