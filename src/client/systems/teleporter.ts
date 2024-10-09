@@ -70,7 +70,7 @@ AFRAME.registerSystem('teleporter', {
         // When a page is being navigated to, prevent that page from being requested multiple times
         if (this._isLocked) return;
 
-        // If the user may be teleporting from the Topics page to an individual Topic
+        // If the user may be teleporting from the topics page to an individual topic
         if (this._currentPage == CurrentPage.Topics) {
             var player_pos = this._getPlayerPosition();
 
@@ -106,7 +106,7 @@ AFRAME.registerSystem('teleporter', {
                 this._isLocked = false;
             })
 
-        // If the user may be teleporting from a Topic page to the Topics page
+        // If the user may be teleporting from a topic page to the Topics page
         } else if (this._currentPage == CurrentPage.Topic) {
             if (this._getPlayerPosition().z <= 0) return;
 
