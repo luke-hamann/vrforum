@@ -43,19 +43,19 @@ AFRAME.registerComponent('form', {
         window.removeEventListener('keydown', this._processKeyboardEvent);
     },
 
-    // Control tabbing between form inputs
+    // Tab between form inputs
     tab(backwards: boolean): void {
         // Unfocus the originally selected component
         var selectedComponent = this.getSelectedInputComponent();
         selectedComponent.unfocus();
 
-        // If the user tabs backwards, decrement the tab index
+        // If the user tabs backwards, decrement the tab order index
         if (backwards) {
             this._tabOrderIndex--;
             if (this._tabOrderIndex < 0) {
                 this._tabOrderIndex = this._tabOrder.length - 1;
             }
-        // If the user tabs forwards, increment the tab index
+        // If the user tabs forwards, increment the tab order index
         } else {
             this._tabOrderIndex++;
             this._tabOrderIndex %= this._tabOrder.length;
