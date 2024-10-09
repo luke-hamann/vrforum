@@ -16,7 +16,7 @@ AFRAME.registerComponent('input', {
         if (this._isTypeTextArea()) chars += '\n';
 
         // Convert the character string to the array
-        this._allowed_characters = chars.split('')
+        this._allowed_characters = chars.split('');
     },
 
     // Focus the input
