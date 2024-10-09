@@ -42,7 +42,7 @@ AFRAME.registerSystem('teleporter', {
             source = parser.parseFromString(text, 'text/html');
         }
 
-        // Generate of map linking topic ids to their coordinates
+        // Generate a map linking topic ids to their coordinates
         var topic_elements = [...source.querySelectorAll('[topic-id]')];
         for (var elm of topic_elements) {
             var topic_id = Number(elm.getAttribute('topic-id'));
