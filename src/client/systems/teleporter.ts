@@ -34,6 +34,7 @@ AFRAME.registerSystem('teleporter', {
         var source = document;
 
         // If the user is on a Topic page, we need to fetch the Topics page to get the coordinates
+        // of the topic houses
         if (this._currentPage == CurrentPage.Topic) {
             var parser = new DOMParser();
             var response = await fetch('/', {headers: {'Refresh': ''}});
