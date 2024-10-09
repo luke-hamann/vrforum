@@ -3,7 +3,7 @@
         - topic: Topic
 #}
 
-{% from './macros.html' import backdrop, text %}
+{% from './_macros.html' import backdrop, text %}
 
 {% from './_globals.html' import
     topic_z_offset_initial,
@@ -26,8 +26,7 @@
             width="2"
             height="3"
             position="0 1.5 -0.05"
-            rotation="0 180 0"
-            link="href: /">
+            rotation="0 180 0">
         </a-plane>
     </a-entity>
 
@@ -59,11 +58,11 @@
     {% set thread_z_offset = topic_z_offset_initial - thread_full_width / 2 %}
     {% for thread in topic.threads %}
         {% if left %}
+            {% set thread_x_offset = -topic_corridor_width / 2 %}
+            {% set thread_y_rotation = 90 %}
+        {% else %}
             {% set thread_x_offset = topic_corridor_width / 2 %}
             {% set thread_y_rotation = -90 %}
-        {% else %}
-            {% set thread_x_offset = topic_corridor_width / -2 %}
-            {% set thread_y_rotation = 90 %}
         {% endif %}
 
         <a-entity

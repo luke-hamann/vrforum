@@ -13,17 +13,12 @@
 {% endmacro %}
 
 {% macro backdrop(class, color, width, height, x, y, z) %}
-<a-entity class="{{ class }}" position="{{ x }} {{ y }} {{ z }}">
-    <a-plane
-        color="{{ color }}"
-        height="{{ height }}"
-        width="{{ width }}">
-    </a-plane>
-    <a-plane
-        color="{{ color }}"
-        height="{{ height }}"
-        width="{{ width }}"
-        rotation="0 180 0">
-    </a-plane>
-</a-entity>
+<a-plane
+    class="{{ class }}"
+    color="{{ color }}"
+    material="side: double;"
+    height="{{ height }}"
+    width="{{ width }}"
+    position="{{ x }} {{ y }} {{ z }}">
+</a-plane>
 {% endmacro %}
