@@ -1,13 +1,19 @@
-{% from './controls.html' import backdrop, label, input %}
+{#
+    Title: New Post Form
+    Parameters:
+        - topic_id: number
+#}
+
+{% from './_controls.html' import backdrop, label, input %}
 
 <a-entity form>
     {{ backdrop() }}
-    {{ input('hidden', 'action', 'post') }}
-    {{ input('hidden', 'topic_id', topic_id) }}
-    {{ label('Title', 0.5) }}
-    {{ input('text', 'title', '', 0.4) }}
-    {{ label('Body', 0.3) }}
-    {{ input('textarea', 'body', '', 0.2) }}
-    {{ input('submit', y_offset=-0.4) }}
-    {{ input('close', y_offset=-0.5) }}
+    {{ input(type='hidden', name='action', value='post') }}
+    {{ input(type='hidden', name='topic_id', value=topic_id) }}
+    {{ label(value='Title', y_offset=0.5) }}
+    {{ input(type='text', name='title', value='', y_offset=0.4) }}
+    {{ label(value='Body', y_offset=0.3) }}
+    {{ input(type='textarea', name='body', value='', y_offset=0.2) }}
+    {{ input(type='submit', y_offset=-0.4) }}
+    {{ input(type='close', y_offset=-0.5) }}
 </a-entity>
