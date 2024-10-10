@@ -30,42 +30,6 @@ AFRAME.registerComponent('form', {
         window.addEventListener('keydown', this._processKeyboardEvent);
     },
 
-    // Remove the form
-    remove: function(): void {
-        // Remove the form from the DOM
-        this.el.remove();
-
-        // Enable wasd movement and the cursor
-        document.querySelector('[camera]').setAttribute('wasd-controls', '');
-        document.querySelector('#cursor').setAttribute('cursor', '');
-
-        // Stop listening for key presses
-        window.removeEventListener('keydown', this._processKeyboardEvent);
-    },
-
-    // Tab between form inputs
-    tab(backwards: boolean): void {
-        // Unfocus the originally selected component
-        var selectedComponent = this.getSelectedInputComponent();
-        selectedComponent.unfocus();
-
-        // If the user tabs backwards, decrement the tab order index
-        if (backwards) {
-            this._tabOrderIndex--;
-            if (this._tabOrderIndex < 0) {
-                this._tabOrderIndex = this._tabOrder.length - 1;
-            }
-        // If the user tabs forward, increment the tab order index
-        } else {
-            this._tabOrderIndex++;
-            this._tabOrderIndex %= this._tabOrder.length;
-        }
-
-        // Focus the newly selected component
-        selectedComponent = this.getSelectedInputComponent();
-        selectedComponent.focus();
-    },
-
     // Get the input component cooresponding to the selected input
     getSelectedInputComponent(): any {
         var index: number = this._tabOrder[this._tabOrderIndex];
@@ -91,6 +55,29 @@ AFRAME.registerComponent('form', {
         }
     },
 
+    // Tab between form inputs
+    tab(backwards: boolean): void {
+        // Unfocus the originally selected component
+        var selectedComponent = this.getSelectedInputComponent();
+        selectedComponent.unfocus();
+
+        // If the user tabs backwards, decrement the tab order index
+        if (backwards) {
+            this._tabOrderIndex--;
+            if (this._tabOrderIndex < 0) {
+                this._tabOrderIndex = this._tabOrder.length - 1;
+            }
+        // If the user tabs forward, increment the tab order index
+        } else {
+            this._tabOrderIndex++;
+            this._tabOrderIndex %= this._tabOrder.length;
+        }
+
+        // Focus the newly selected component
+        selectedComponent = this.getSelectedInputComponent();
+        selectedComponent.focus();
+    },
+
     // Attempt to submit the form
     submit: async function(): Promise<void> {
         // Get all the inputs with name attributes
@@ -99,7 +86,7 @@ AFRAME.registerComponent('form', {
         
         // Construct a payload to send to the server based on the form inputs
         var payload = new URLSearchParams();
-        for (const input of inputs) {
+        for (var input of inputs) {
             var name = input.getAttribute('name');
             var value = input.getAttribute('value');
             payload.set(name!, value!);
@@ -138,5 +125,18 @@ AFRAME.registerComponent('form', {
 
         // Delete the form element after sucessful submission
         this.remove();
+    },
+
+    // Remove the form
+    remove: function(): void {
+        // Remove the form from the DOM
+        this.el.remove();
+
+        // Enable wasd movement and the cursor
+        document.querySelector('[camera]').setAttribute('wasd-controls', '');
+        document.querySelector('#cursor').setAttribute('cursor', '');
+
+        // Stop listening for key presses
+        window.removeEventListener('keydown', this._processKeyboardEvent);
     }
 });
