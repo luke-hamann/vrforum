@@ -6,16 +6,22 @@ enum CurrentPage {
     Topic
 }
 
+// An interface for describing a position
+interface Position {
+    x: number,
+    z: number
+}
+
 AFRAME.registerSystem('teleporter', {
     _currentPage: CurrentPage.Topics,
     _currentTopicId: -1,
     _player: document.querySelector('[camera]'),
     _scene: document.querySelector('.scene'),
-    _topics: new Map(),
+    _topicPositions: new Map<number, Position>(),
     _isLocked: false,
 
     // Initialize the teleporter system
-    init: async function() {
+    init: async function(): Promise<void> {
         // Identify the current page and set the state accordingly
         var pathname = window.location.pathname;
         if (pathname == '/') {
@@ -24,41 +30,41 @@ AFRAME.registerSystem('teleporter', {
         } else {
             const re = /^\/topic\/(\d+)\/$/;
             var match = pathname.match(re);
-            if (match !== null) {
+            if (match != null) {
                 this._currentPage = CurrentPage.Topic;
                 this._currentTopicId = Number(match[1]);
             }
         }
 
-        // If the user is on the Topics page, we already have the coordinates of the topic houses
-        var source = document;
+        // If the user is on the topics page, we already have the coordinates of the topic houses
+        var source: Document = document;
 
-        // If the user is on a Topic page, we need to fetch the Topics page to get the coordinates
+        // If the user is on a topic page, we need to fetch the topics page to get the coordinates
         // of the topic houses
         if (this._currentPage == CurrentPage.Topic) {
-            var parser = new DOMParser();
-            var response = await fetch('/', {headers: {'Refresh': ''}});
+            var response = await fetch('/', { headers: { 'Refresh': '' } });
             var text = await response.text();
+            var parser = new DOMParser();
             source = parser.parseFromString(text, 'text/html');
         }
 
-        // Generate a map linking topic ids to their coordinates
-        var topic_elements = [...source.querySelectorAll('[topic-id]')];
-        for (var elm of topic_elements) {
-            var topic_id = Number(elm.getAttribute('topic-id'));
+        // Generate a map to link topic ids with the coordinates of their houses
+        var topicElements = [...source.querySelectorAll('[topic-id]')];
+        for (var elm of topicElements) {
+            var topicId = Number(elm.getAttribute('topic-id'));
             var x = Number(elm.getAttribute('absolute-x'));
             var z = Number(elm.getAttribute('absolute-z'));
-            this._topics.set(topic_id, { x, z });
+            this._topicPositions.set(topicId, { x, z });
         }
 
         // Reload the page when the user clicks the back button
-        window.addEventListener("popstate", () => {
+        window.addEventListener("popstate", (): void => {
             window.location.reload();
         });
     },
 
-    // Get the x and z coordinates of the player
-    _getPlayerPosition: function(): {x: number, z: number} {
+    // Get the coordinates of the player
+    _getPlayerPosition: function(): Position {
         return {
             x: (this._player as any).object3D.position.x as number,
             z: (this._player as any).object3D.position.z as number
@@ -66,22 +72,22 @@ AFRAME.registerSystem('teleporter', {
     },
 
     // Watch for inter-page navigation based on the player's position
-    tick: function() {
-        // When a page is being navigated to, prevent that page from being requested multiple times
+    tick: function(): void {
+        // When a page is being navigated to, prevent multiple requests of the page
         if (this._isLocked) return;
 
-        // If the user may be teleporting from the topics page to an individual topic
+        // If the user may be navigating from the topics page to an individual topic
         if (this._currentPage == CurrentPage.Topics) {
-            var player_pos = this._getPlayerPosition();
+            var playerPosition: Position = this._getPlayerPosition();
 
             // Determine if the player is deep enough on the z-axis to be at the topic houses
-            if (player_pos.z > -10 || player_pos.z < -11) return;
+            if (playerPosition.z > -10 || playerPosition.z < -11) return;
 
             // Determine if the player is close enough to a given topic door
             this._currentTopicId = -1;
-            for (var [topic_id, topic_pos] of this._topics) {
-                if (Math.abs(player_pos.x - topic_pos.x) < 1) {
-                    this._currentTopicId = topic_id;
+            for (var [topicId, topicPosition] of this._topicPositions) {
+                if (Math.abs(playerPosition.x - topicPosition.x) < 1) {
+                    this._currentTopicId = topicId;
                     break;
                 }
             }
@@ -90,7 +96,7 @@ AFRAME.registerSystem('teleporter', {
 
             this._isLocked = true;
 
-            // Request the selected topic page
+            // Request and transition to the selected topic page
             var url = `/topic/${this._currentTopicId}/`;
             fetch(url, { headers: { 'Refresh': '' }})
             .then((response) => response.text())
@@ -106,14 +112,14 @@ AFRAME.registerSystem('teleporter', {
                 this._isLocked = false;
             })
 
-        // If the user may be teleporting from a topic page to the Topics page
+        // If the user may be navigating from a topic page to the topics page
         } else if (this._currentPage == CurrentPage.Topic) {
-            // If the user entered the topic exit wall
+            // Check if the user has not entered topic exit wall
             if (this._getPlayerPosition().z <= 0) return;
 
             this._isLocked = true;
 
-            // Request the topics page
+            // Request and transition to the topics page
             var url = '/';
             fetch(url, { headers: { 'Refresh': '' }})
             .then((response) => response.text())
@@ -123,9 +129,9 @@ AFRAME.registerSystem('teleporter', {
 
                 window.history.pushState(undefined, '', url);
                 
-                var topic = this._topics.get(this._currentTopicId);
-                this._player.object3D.position.x = topic.x;
-                this._player.object3D.position.z = topic.z;
+                var topicPosition = this._topicPositions.get(this._currentTopicId)!;
+                this._player.object3D.position.x = topicPosition.x;
+                this._player.object3D.position.z = topicPosition.z;
 
                 this._isLocked = false;
             });
