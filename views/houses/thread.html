@@ -39,7 +39,8 @@
     </a-plane>
 
     {# Set the initial coordinates for the post within the thread #}
-    {% set x_offset = -thread_padding - thread_post_footprint_width %}
+    {% set x_offset = -(thread_full_width / 2) + thread_padding +
+        (thread_post_footprint_width / 2) %}
     {% set z_offset = -thread_padding - (thread_post_footprint_depth / 2) %}
 
     {# Post within the thread #}
