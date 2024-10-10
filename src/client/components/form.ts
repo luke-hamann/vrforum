@@ -117,7 +117,7 @@ AFRAME.registerComponent('form', {
         // Hot-swap the relevant piece of the DOM
         var selector: string = this.el.getAttribute('hotswap')!;
         var element: Element = document.querySelector(selector);
-        element.innerHTML = content;
+        element.outerHTML = content;
 
         // Remove the form after sucessful submission
         this.remove();
