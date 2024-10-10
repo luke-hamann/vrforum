@@ -1,7 +1,7 @@
 'use strict';
 
 AFRAME.registerComponent('input', {
-    _allowed_characters: [] as string[],
+    _allowedCharacters: [] as string[],
     _isFocused: false,
     _insertionPoint: 0,
 
@@ -15,8 +15,8 @@ AFRAME.registerComponent('input', {
         // If the input is a text area, new lines are allowed
         if (this._isTypeTextArea()) chars += '\n';
 
-        // Convert the character string to the array
-        this._allowed_characters = chars.split('');
+        // Convert the character string to an array
+        this._allowedCharacters = chars.split('');
     },
 
     // Focus the input
@@ -66,15 +66,15 @@ AFRAME.registerComponent('input', {
 
     // Determine if the input is a hidden field
     _isTypeHidden: function(): boolean {
-        return (this.el.getAttribute('type') === 'hidden');
+        return this.el.getAttribute('type') == 'hidden';
     },
 
-    // Insert a substring into a larger string into a specified position
+    // Insert a substring into another string at a specified position
     _insertText(original: string, text: string, position: number): string {
         return original.slice(0, position) + text + original.slice(position);
     },
 
-    // Render the input element on the form during each frame
+    // Render the input element on the form each frame
     tick: function(time: number, timeDelta: number): void {
         // Hidden inputs should not be rendered
         if (this._isTypeHidden()) return;
@@ -83,23 +83,23 @@ AFRAME.registerComponent('input', {
 
         // Submit buttons show [ Submit ] when unfocused, [ SUBMIT ] when focused
         if (this._isTypeSubmit()) {
-            var text = '[ Submit ]';
+            text = '[ Submit ]';
             if (this._isFocused) text = text.toUpperCase();
 
         // Close buttons show [ Close ] when unfocused, [ CLOSE ] when focused
         } else if (this._isTypeClose()) {
-            var text = '[ Close ]';
+            text = '[ Close ]';
             if (this._isFocused) text = text.toUpperCase();
 
         // Text boxes and text areas are rendered based on their value
         } else if (this._isTypeText() || this._isTypeTextArea()) {
-            var text = this._getValue();
+            text = this._getValue();
             if (this._isFocused) {
                 // Create the flashing cursor
                 var cursor = (time % 800 < 400) ? '|' : ' ';
 
-                // Insert the cursor into the textual representation of the input
-                var text = this._insertText(text, cursor, this._insertionPoint);
+                // Insert the cursor into the rendered representation of the input's value
+                text = this._insertText(text, cursor, this._insertionPoint);
             }
         }
 
@@ -129,33 +129,33 @@ AFRAME.registerComponent('input', {
                 document.querySelector('[form]').components.form.remove();
             }
 
-        
+        // Process interactions with text boxes and text areas
         } else if (this._isTypeText() || this._isTypeTextArea()) {
-            var currentValue = this.el.getAttribute('value');
-
             if (key == 'Enter') key = '\n';
 
-            // If the user is attempting to type text into the form
-            if (this._allowed_characters.includes(key)) {
-                var value = this._insertText(currentValue, key, this._insertionPoint);
+            // If the user is attempting to type text
+            if (this._allowedCharacters.includes(key)) {
+                var value = this._insertText(this._getValue(), key, this._insertionPoint);
                 this._setValue(value);
                 this._insertionPoint++;
-            
+
             // Deleting text
             } else if (key == 'Backspace') {
-                if (this._insertionPoint > 0) {
-                    var value = this._getValue();
-                    value = value.substring(0, this._insertionPoint - 1) +
-                        value.substring(this._insertionPoint);
-                    this._setValue(value);
-                    this._insertionPoint--;
-                }
+                if (this._insertionPoint <= 0) return;
+
+                var value = this._getValue();
+                value = value.substring(0, this._insertionPoint - 1) +
+                    value.substring(this._insertionPoint);
+                this._setValue(value);
+                this._insertionPoint--;
             
             // Navigation
             } else if (key == 'ArrowLeft') {
-                this._insertionPoint = Math.max(0, this._insertionPoint - 1);
+                if (this._insertionPoint <= 0) return;
+                this._insertionPoint--;
             } else if (key == 'ArrowRight') {
-                this._insertionPoint = Math.min(this._getValue().length, this._insertionPoint + 1);
+                if (this._insertionPoint > this._getValue().length - 1) return;
+                this._insertionPoint++;
             }
         }
     }
