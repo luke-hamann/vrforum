@@ -1,11 +1,17 @@
-{% from './controls.html' import label, input, backdrop %}
+{#
+    Title: New Reply Form
+    Parameters:
+        - post_id: number
+#}
+
+{% from './_controls.html' import label, input, backdrop %}
 
 <a-entity form>
     {{ backdrop() }}
-    {{ input('hidden', 'action', 'reply') }}
-    {{ input('hidden', 'post_id', post_id) }}
-    {{ label('Body', 0.5) }}
-    {{ input('textarea', 'body', '', 0.4) }}
-    {{ input('submit', y_offset=-0.4) }}
-    {{ input('close', y_offset=-0.5) }}
+    {{ input(type='hidden', name='action', value='reply') }}
+    {{ input(type='hidden', name='post_id', value=post_id) }}
+    {{ label(value='Body', y_offset=0.5) }}
+    {{ input(type='textarea', name='body', value='', y_offset=0.4) }}
+    {{ input(type='submit', y_offset=-0.4) }}
+    {{ input(type='close', y_offset=-0.5) }}
 </a-entity>

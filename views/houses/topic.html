@@ -13,6 +13,8 @@
 %}
 
 <a-entity class="topic">
+
+    {# The wall with the door at the origin #}
     <a-entity class="wall">
         <a-plane
             color="red"
@@ -30,10 +32,11 @@
         </a-plane>
     </a-entity>
 
+    {# The mailbox for launching the new post form #}
     <a-entity
         class="mailbox"
         position="{{ topic_corridor_width / 2 }} 0 {{ topic_z_offset_initial + 2 }}"
-        formlauncher="action: post; id: {{ topic.id }}; name: {{ topic.name }};">
+        formlauncher="type: post; id: {{ topic.id }}; name: {{ topic.name }};">
         <a-box
             color="brown"
             width="0.5"
@@ -51,28 +54,44 @@
         {{ text('new-post', 'center', 'black', 5, 'New Post', 0, 1.7, 0) }}
     </a-entity>
 
+    {# The topic title #}
     {{ text('topic-name', 'center', 'black', 50, topic.name, 0, 10,
         topic_z_offset_initial) }}
 
+    {#
+        The first thread should be placed on the left side of the cooridor.
+    #}
     {% set left = true %}
     {% set thread_z_offset = topic_z_offset_initial - thread_full_width / 2 %}
+
     {% for thread in topic.threads %}
+
+        {# Threads on the left should be offset to the left and face right. #}
         {% if left %}
             {% set thread_x_offset = -topic_corridor_width / 2 %}
             {% set thread_y_rotation = 90 %}
+
+        {# Threads on the right should be offset to the right and face left. #}
         {% else %}
             {% set thread_x_offset = topic_corridor_width / 2 %}
             {% set thread_y_rotation = -90 %}
         {% endif %}
 
+        {# Render the thread #}
         <a-entity
             position="{{ thread_x_offset }} 0 {{ thread_z_offset }}"
             rotation="0 {{ thread_y_rotation }} 0">
             {% include './thread.html' %}
         </a-entity>
 
+        {# If the current thread is on the left, the next one should be on the right. #}
         {% if left %}
             {% set left = false %}
+
+        {#
+            If the current thread is on the right, the next one should be on the left.
+            We also need to push the thread deeper along the z-axis away from the origin.
+        #}
         {% else %}
             {% set left = true %}
             {% set thread_z_delta = topic_thread_gap + thread_full_width %}
