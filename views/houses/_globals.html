@@ -4,8 +4,8 @@
 
 {# Topics Page #}
 
-    {# How deep into the screen the row of houses should be from the origin (in meters) #}
-    {% set topics_row_depth = 10 %}
+    {# How deep into the screen the row of houses should be (in meters) #}
+    {% set topics_row_depth = -10 %}
 
     {# Topic House #}
 
@@ -26,7 +26,7 @@
 
         {# Topic Title #}
 
-            {% set house_title_height = 4 %}
+            {% set house_title_y_offset = 4 %}
             {% set house_title_font_width = 15 %}
         
         {# Roof #}
@@ -35,7 +35,7 @@
 
     {# App Title #}
 
-        {% set app_title_height = 10 %}
+        {% set app_title_y_offset = 10 %}
         {% set app_title_font_width = 30 %}
 
 {# Topic Page #}
@@ -65,8 +65,8 @@
             {% set thread_full_width = thread_content_width + 2 * thread_padding %}
 
             {#
-                Thread Layout
-                -------------
+                Thread Layout Example
+                ---------------------
 
                     1  2  3     - lanes
                 [*][*][*][*][*]
