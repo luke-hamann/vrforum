@@ -11,7 +11,7 @@ AFRAME.registerComponent('form', {
         document.querySelector('[camera]').removeAttribute('wasd-controls');
         document.querySelector('#cursor').removeAttribute('cursor');
 
-        // Construct the form's list of input elements and tab order
+        // Construct the list of input elements and the tab order
         this._inputElements = [...this.el.querySelectorAll('[input]')];
         this._tabOrder = [];
         for (var i = 0; i < this._inputElements.length; i++) {
@@ -31,9 +31,9 @@ AFRAME.registerComponent('form', {
     },
 
     // Remove the form
-    remove: function() {
+    remove: function(): void {
         // Remove the form from the DOM
-        document.querySelector('[formmount]').innerHTML = '';
+        this.el.remove();
 
         // Enable wasd movement and the cursor
         document.querySelector('[camera]').setAttribute('wasd-controls', '');
@@ -66,7 +66,7 @@ AFRAME.registerComponent('form', {
         selectedComponent.focus();
     },
 
-    // Get the A-Frame input component cooresponding to the selected input
+    // Get the input component cooresponding to the selected input
     getSelectedInputComponent(): any {
         var index: number = this._tabOrder[this._tabOrderIndex];
         var element: Element = this._inputElements[index];
@@ -92,7 +92,7 @@ AFRAME.registerComponent('form', {
     },
 
     // Attempt to submit the form
-    submit: async function() {
+    submit: async function(): Promise<void> {
         // Get all the inputs with name attributes
         var inputs: Element[] = [...this.el.querySelectorAll('[input]')]
             .filter((elm) => elm.hasAttribute('name'));
