@@ -6,7 +6,12 @@
 
 {% from './_controls.html' import label, input, backdrop %}
 
-<a-entity form>
+{#
+    This form should be submitted to the root path.
+    It is expecting the server to send an a-entity representing a topic in response.
+    "Hotswap" is a selector for which element the topic should be injected into.
+#}
+<a-entity form action="/" hotswap=".scene">
     {{ backdrop() }}
     {{ input(type='hidden', name='action', value='post') }}
     {{ input(type='hidden', name='topic_id', value=topic_id) }}

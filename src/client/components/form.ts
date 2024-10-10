@@ -93,9 +93,10 @@ AFRAME.registerComponent('form', {
         }
 
         // POST the payload to the server
+        var action: string = this.el.getAttribute('action');
         var response: Response;
         try {
-            response = await fetch('/', {
+            response = await fetch(action, {
                 method: 'POST',
                 body: payload
             });
@@ -113,24 +114,19 @@ AFRAME.registerComponent('form', {
             return;
         }
 
-        // Hot-swap the relevant piece of the DOM based on the action taken
-        if (payload.get('action') == 'post') {
-            var scene = document.querySelector('.scene');
-            scene.innerHTML = content;
-        } else if (payload.get('action') == 'reply') {
-            var post_id = payload.get('post_id');
-            var thread = document.querySelector(`[thread-post-id="${post_id}"]`);
-            thread.innerHTML = content;
-        }
+        // Hot-swap the relevant piece of the DOM
+        var selector: string = this.el.getAttribute('hotswap')!;
+        var element: Element = document.querySelector(selector);
+        element.innerHTML = content;
 
-        // Delete the form element after sucessful submission
+        // Remove the form after sucessful submission
         this.remove();
     },
 
     // Remove the form
     remove: function(): void {
         // Remove the form from the DOM
-        this.el.remove();
+        this.el.parentNode?.removeChild(this.el);
 
         // Enable wasd movement and the cursor
         document.querySelector('[camera]').setAttribute('wasd-controls', '');
