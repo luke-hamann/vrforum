@@ -36,7 +36,7 @@
     <a-entity
         class="mailbox"
         position="{{ topic_corridor_width / 2 }} 0 {{ topic_z_offset_initial + 2 }}"
-        formlauncher="type: post; id: {{ topic.id }}; name: {{ topic.name }};">
+        formlauncher="/topic/{{ topic.id }}/post/">
         <a-box
             color="brown"
             width="0.5"
