@@ -6,7 +6,7 @@ AFRAME.registerComponent('formlauncher', {
     // Initialize the form launcher in the scene
     init: function(): void {
         // Make the a-entity clickable to launch the form
-        this.el.addEventListener('click', async () => {
+        this.el.addEventListener('click', async (): Promise<void> => {
             // Fetch the form from the server
             var url: string = this.data;
             var form: string;
