@@ -15,10 +15,10 @@
     house_spacing,
     house_door_width,
     house_door_height,
-    house_title_height,
+    house_title_y_offset,
     house_title_font_width,
     house_roof_height,
-    app_title_height,
+    app_title_y_offset,
     app_title_font_width
 %}
 
@@ -44,8 +44,8 @@
         width=app_title_font_width,
         value='VR Forum',
         x=-house_row_x_offset,
-        y=app_title_height,
-        z=-topics_row_depth) }}
+        y=app_title_y_offset,
+        z=topics_row_depth) }}
 
     {# Topic houses should start on the left. #}
     {% set x_offset = 0 %}
@@ -54,9 +54,9 @@
         {# Topic house #}
         <a-entity
             topic-id="{{ topic.id }}"
-            position="{{ x_offset }} 0 {{ -topics_row_depth }}"
+            position="{{ x_offset }} 0 {{ topics_row_depth }}"
             absolute-x="{{ house_row_x_offset + x_offset }}"
-            absolute-z="{{ -topics_row_depth }}">
+            absolute-z="{{ topics_row_depth }}">
 
             {# Brickwork #}
             <a-box
@@ -126,7 +126,7 @@
                 width=house_title_font_width,
                 value=topic.name,
                 x=0,
-                y=house_title_height,
+                y=house_title_y_offset,
                 z=0.1) }}
         </a-entity>
 
