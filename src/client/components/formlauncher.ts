@@ -1,10 +1,10 @@
 'use strict';
 
 AFRAME.registerComponent('formlauncher', {
-    schema: {type: 'string'}, // The url of the form
+    schema: { type: 'string' }, // The url of the form
 
     // Initialize the form launcher in the scene
-    init: function(): void {
+    init: function (): void {
         // Make the a-entity clickable to launch the form
         this.el.addEventListener('click', async (): Promise<void> => {
             // Fetch the form from the server
