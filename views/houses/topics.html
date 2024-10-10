@@ -1,6 +1,5 @@
 {#
     Title: Topics Page
-    Purpose: Render the row of houses and app title for the topics page
     Parameters:
         - topics: Topic[]
 #}
@@ -18,44 +17,39 @@
     house_title_y_offset,
     house_title_font_width,
     house_roof_height,
+    app_title,
     app_title_y_offset,
     app_title_font_width
 %}
 
-{#
-    The row of houses should be offset to the left initially,
-    so they are centered in front of the player.
-#}
 {% set house_count = topics.length %}
-{% set house_row_x_offset =
-    ((house_width * house_count) + (house_spacing * (house_count - 1)))
-    / -2
-    + (house_width / 2)
-%}
+{% set house_row_width = (house_width * house_count) +
+    (house_spacing * (house_count - 1)) %}
 
-{# The row of houses #}
-<a-entity position="{{ house_row_x_offset }} 0 0">
+<a-entity class="topics">
 
-    {# Application title #}
+    {# Application title --------------------------------------------------- #}
+
     {{ text(
         class='app-title',
         align='center',
         color='black',
         width=app_title_font_width,
-        value='VR Forum',
-        x=-house_row_x_offset,
+        value=app_title,
+        x=0,
         y=app_title_y_offset,
         z=topics_row_depth) }}
 
-    {# Topic houses should start on the left. #}
-    {% set x_offset = 0 %}
+    {# Render the houses --------------------------------------------------- #}
+
+    {% set x_offset = -(house_row_width / 2) + (house_width / 2) %}
     {% for topic in topics %}
 
         {# Topic house #}
         <a-entity
             topic-id="{{ topic.id }}"
             position="{{ x_offset }} 0 {{ topics_row_depth }}"
-            absolute-x="{{ house_row_x_offset + x_offset }}"
+            absolute-x="{{ x_offset }}"
             absolute-z="{{ topics_row_depth }}">
 
             {# Brickwork #}
@@ -64,7 +58,7 @@
                 width="{{ house_width }}"
                 height="{{ house_height }}"
                 depth="{{ house_depth }}"
-                position="0 {{ house_height / 2 }} {{ - house_depth / 2 }}">
+                position="0 {{ house_height / 2 }} {{ -house_depth / 2 }}">
             </a-box>
 
             {# Roof #}
@@ -72,18 +66,24 @@
                 class="roof"
                 position="0 {{ house_height }} 0"
                 scale="{{ house_width }} {{ house_roof_height }} {{ house_depth }}">
+
+                {# Front triangle #}
                 <a-triangle
                     color="yellow"
                     vertex-a="-0.5 0 0"
                     vertex-b="0.5 0 0"
                     vertex-c="0 1 0">
                 </a-triangle>
+
+                {# Back triangle #}
                 <a-triangle
                     color="yellow"
                     vertex-a="0.5 0 -1"
                     vertex-b="-0.5 0 -1"
                     vertex-c="0 1 -1">
                 </a-triangle>
+
+                {# Roof left side #}
                 <a-triangle
                     color="yellow"
                     vertex-a="-0.5 0 -1"
@@ -96,6 +96,8 @@
                     vertex-b="-0.5 0 -1"
                     vertex-c="0 1 0">
                 </a-triangle>
+
+                {# Roof right side #}
                 <a-triangle
                     color="yellow"
                     vertex-a="0.5 0 -1"
@@ -118,9 +120,9 @@
                 position="0 {{ house_door_height / 2 }} 0.05">
             </a-plane>
 
-            {# Topic name (above the door) #}
+            {# Topic name #}
             {{ text(
-                class='topic-title',
+                class='topic-name',
                 align='center',
                 color='black',
                 width=house_title_font_width,
@@ -130,10 +132,7 @@
                 z=0.1) }}
         </a-entity>
 
-        {#
-            The next house should be placed further to the right by the sum of the width of the
-            house and the spacing between the houses.
-        #}
+        {# Move the next house further right. #}
         {% set x_offset = x_offset + house_width + house_spacing %}
     {% endfor %}
 </a-entity>
