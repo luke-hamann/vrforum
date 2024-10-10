@@ -109,5 +109,5 @@ app.get('/post/:post_id/reply/',
 });
 
 app.listen(port, () => {
-    console.log(`Listening on port ${port}`);
+    console.log(`Listening at http://localhost:${port}/`);
 });
