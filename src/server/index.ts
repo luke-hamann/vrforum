@@ -7,19 +7,8 @@ import Post from './models/post.js';
 import Reply from './models/reply.js';
 import Topic from './models/topic.js';
 import Database from './models/database.js';
-import nunjucks from 'nunjucks';
 const app = express();
 const port = 8001;
-
-// Nunjucks configuration
-nunjucks.configure('../../views', {
-    autoescape: true,
-    express: app,       // For using Nunjucks with Express
-    throwOnUndefined: true,  // Enable better error reporting
-    noCache: true       // Disable caching for development
-});
-
-
 
 // Read url-encoded post data
 app.use(express.urlencoded({ extended: true }));
