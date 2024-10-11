@@ -53,12 +53,10 @@
         class="post"
         position="{{ x_offset }} 0 {{ z_offset }}"
         formlauncher="/post/{{ thread.post.id }}/reply/">
+        {% include '../resources/tablet.html' %}
         {{ text('post-title', 'left', 'black', 1.5, thread.post.title, 0.25, 2,
             0) }}
         {{ text('post-details', 'left', 'black', 1, post_details, 0, 1.9, 0) }}
-
-        {% include '../resources/tablet.html' %}
-
     </a-entity>
 
     {# Render the replies --------------------------------------------------- #}
