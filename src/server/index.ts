@@ -7,6 +7,7 @@ import Post from './models/post.js';
 import Reply from './models/reply.js';
 import Topic from './models/topic.js';
 import Database from './models/database.js';
+
 const app = express();
 const port = 8001;
 
