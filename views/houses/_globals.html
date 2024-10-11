@@ -44,10 +44,12 @@
     {# How deep into the screen the corridor should start (in meters) #}
     {% set topic_z_offset_initial = -20 %}
 
-    {# How far the threads on the left should be from the threads on the right (in meters) #}
+    {# How far the threads on the left should be from the threads on the right
+       (in meters) #}
     {% set topic_corridor_width = 10 %}
 
-    {# How far neighboring threads should be separated from each other (in meters) #}
+    {# How far neighboring threads should be separated from each other (in
+       meters) #}
     {% set topic_thread_gap = 4 %}
 
     {# Thread #}
@@ -62,8 +64,10 @@
             {% set thread_lane_count = 5 %}
             {% set thread_padding = 2 %}
 
-            {% set thread_content_width = thread_lane_count * thread_post_footprint_width %}
-            {% set thread_full_width = thread_content_width + 2 * thread_padding %}
+            {% set thread_content_width =
+                thread_lane_count * thread_post_footprint_width %}
+            {% set thread_full_width = thread_content_width +
+                (2 * thread_padding) %}
 
             {#
                 Thread Layout Example
