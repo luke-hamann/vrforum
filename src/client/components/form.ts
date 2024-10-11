@@ -10,7 +10,7 @@ AFRAME.registerComponent('form', {
         // Disable wasd movement and the cursor
         document.querySelector('[camera]').removeAttribute('wasd-controls');
         document.querySelector('#cursor').setAttribute('raycaster', {
-            objects: null
+            enabled: false
         });
 
         // Construct the list of input elements and the tab order
@@ -42,14 +42,13 @@ AFRAME.registerComponent('form', {
 
     // Process keyboard events passed to the form
     _process_keyboard_event: function(event: KeyboardEvent): void {
-        event.preventDefault();
-
         // Get the form component
         var form = document.querySelector('[form]').components.form;
 
         // If the user presses tab (and possibly shift), tab between focusable
         // inputs
         if (event.key == 'Tab') {
+            event.preventDefault();
             form.tab(event.shiftKey);
         // Otherwise, forward the keyboard event to the selected input
         } else {
@@ -133,7 +132,9 @@ AFRAME.registerComponent('form', {
 
         // Enable wasd movement and the cursor
         document.querySelector('[camera]').setAttribute('wasd-controls', '');
-        document.querySelector('#cursor').setAttribute('raycaster', '');
+        document.querySelector('#cursor').setAttribute('raycaster', {
+            enabled: true
+        });
 
         // Stop listening for key presses
         window.removeEventListener('keydown', this._process_keyboard_event);
