@@ -9,7 +9,9 @@ AFRAME.registerComponent('form', {
     init: function(): void {
         // Disable wasd movement and the cursor
         document.querySelector('[camera]').removeAttribute('wasd-controls');
-        document.querySelector('#cursor').removeAttribute('cursor');
+        document.querySelector('#cursor').setAttribute('raycaster', {
+            objects: null
+        });
 
         // Construct the list of input elements and the tab order
         this._input_elements = [...this.el.querySelectorAll('[input]')];
@@ -131,7 +133,7 @@ AFRAME.registerComponent('form', {
 
         // Enable wasd movement and the cursor
         document.querySelector('[camera]').setAttribute('wasd-controls', '');
-        document.querySelector('#cursor').setAttribute('cursor', '');
+        document.querySelector('#cursor').setAttribute('raycaster', '');
 
         // Stop listening for key presses
         window.removeEventListener('keydown', this._process_keyboard_event);
