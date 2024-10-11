@@ -1,9 +1,9 @@
 'use strict';
 
 AFRAME.registerComponent('form', {
-    _inputElements: [] as Element[],
-    _tabOrder: [] as number[],
-    _tabOrderIndex: 0,
+    _input_elements: [] as Element[],
+    _tab_order: [] as number[],
+    _tab_order_index: 0,
 
     // Initalize the form in the scene
     init: function(): void {
@@ -12,70 +12,71 @@ AFRAME.registerComponent('form', {
         document.querySelector('#cursor').removeAttribute('cursor');
 
         // Construct the list of input elements and the tab order
-        this._inputElements = [...this.el.querySelectorAll('[input]')];
-        this._tabOrder = [];
-        for (var i = 0; i < this._inputElements.length; i++) {
-            var input = this._inputElements[i];
+        this._input_elements = [...this.el.querySelectorAll('[input]')];
+        this._tab_order = [];
+        for (var i = 0; i < this._input_elements.length; i++) {
+            var input = this._input_elements[i];
             var type = input.getAttribute('type');
             if (type !== 'hidden') {
-                this._tabOrder.push(i);
+                this._tab_order.push(i);
             }
         }
 
         // Focus the first focusable input on the form
-        this._tabOrderIndex = 0;
-        this.getSelectedInputComponent().focus();
+        this._tab_order_index = 0;
+        this.get_selected_input_component().focus();
 
         // Listen for key presses
-        window.addEventListener('keydown', this._processKeyboardEvent);
+        window.addEventListener('keydown', this._process_keyboard_event);
     },
 
     // Get the input component cooresponding to the selected input
-    getSelectedInputComponent(): any {
-        var index: number = this._tabOrder[this._tabOrderIndex];
-        var element: Element = this._inputElements[index];
+    get_selected_input_component(): any {
+        var index: number = this._tab_order[this._tab_order_index];
+        var element: Element = this._input_elements[index];
         var component = (element as any).components.input;
         return component;
     },
 
     // Process keyboard events passed to the form
-    _processKeyboardEvent: function(event: KeyboardEvent): void {
+    _process_keyboard_event: function(event: KeyboardEvent): void {
         event.preventDefault();
 
         // Get the form component
         var form = document.querySelector('[form]').components.form;
 
-        // If the user presses tab (and possibly shift), tab between focusable inputs
+        // If the user presses tab (and possibly shift), tab between focusable
+        // inputs
         if (event.key == 'Tab') {
             form.tab(event.shiftKey);
         // Otherwise, forward the keyboard event to the selected input
         } else {
-            var inputComponent = form.getSelectedInputComponent();
-            inputComponent.processKeyboardEvent(event);
+            var input_component = form.get_selected_input_component();
+            input_component.process_keyboard_event(event);
         }
     },
 
     // Tab between form inputs
     tab(backwards: boolean): void {
         // Unfocus the originally selected component
-        var selectedComponent = this.getSelectedInputComponent();
-        selectedComponent.unfocus();
+        var selected_component = this.get_selected_input_component();
+        selected_component.unfocus();
 
         // If the user tabs backwards, decrement the tab order index
         if (backwards) {
-            this._tabOrderIndex--;
-            if (this._tabOrderIndex < 0) {
-                this._tabOrderIndex = this._tabOrder.length - 1;
+            this._tab_order_index--;
+            if (this._tab_order_index < 0) {
+                this._tab_order_index = this._tab_order.length - 1;
             }
         // If the user tabs forward, increment the tab order index
         } else {
-            this._tabOrderIndex++;
-            this._tabOrderIndex %= this._tabOrder.length;
+            this._tab_order_index++;
+            this._tab_order_index %= this._tab_order.length;
         }
 
         // Focus the newly selected component
-        selectedComponent = this.getSelectedInputComponent();
-        selectedComponent.focus();
+        selected_component = this.get_selected_input_component();
+        selected_component.focus();
     },
 
     // Attempt to submit the form
@@ -133,6 +134,6 @@ AFRAME.registerComponent('form', {
         document.querySelector('#cursor').setAttribute('cursor', '');
 
         // Stop listening for key presses
-        window.removeEventListener('keydown', this._processKeyboardEvent);
+        window.removeEventListener('keydown', this._process_keyboard_event);
     }
 });
