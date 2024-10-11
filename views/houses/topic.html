@@ -1,4 +1,5 @@
 {#
+    Title: Topic Page
     Parameters:
         - topic: Topic
 #}
@@ -6,6 +7,8 @@
 {% from './_macros.html' import backdrop, text %}
 
 {% from './_globals.html' import
+    house_door_width,
+    house_door_height,
     topic_z_offset_initial,
     topic_corridor_width,
     topic_thread_gap,
@@ -13,6 +16,8 @@
 %}
 
 <a-entity class="topic">
+
+    {# The wall with the door at the origin #}
     <a-entity class="wall">
         <a-plane
             color="red"
@@ -23,56 +28,78 @@
         </a-plane>
         <a-plane
             color="brown"
-            width="2"
-            height="3"
-            position="0 1.5 -0.05"
+            width="{{ house_door_width }}"
+            height="{{ house_door_height }}"
+            position="0 {{ house_door_height / 2 }} -0.05"
             rotation="0 180 0">
         </a-plane>
     </a-entity>
 
+    {# The mailbox for launching the new post form #}
     <a-entity
-        class="mailbox"
         position="{{ topic_corridor_width / 2 }} 0 {{ topic_z_offset_initial + 2 }}"
-        formlauncher="action: post; id: {{ topic.id }}; name: {{ topic.name }};">
+        formlauncher="/topic/{{ topic.id }}/post/">
+
+        {# The box of the mailbox #}
         <a-box
             color="brown"
             width="0.5"
             height="0.5"
             depth="1"
-            position="0 1.2 0">
+            position="0 1.25 0">
         </a-box>
+
+        {# The post of the mailbox #}
         <a-box
             color="brown"
             width="0.25"
-            height="0.7"
+            height="1"
             depth="0.25"
-            position="0 0.6 0">
+            position="0 0.5 0">
         </a-box>
+
+        {# The text above the mailbox #}
         {{ text('new-post', 'center', 'black', 5, 'New Post', 0, 1.7, 0) }}
     </a-entity>
 
+    {# The topic title #}
     {{ text('topic-name', 'center', 'black', 50, topic.name, 0, 10,
         topic_z_offset_initial) }}
 
+    {#
+        The first thread should be placed on the left side of the corridor.
+    #}
     {% set left = true %}
-    {% set thread_z_offset = topic_z_offset_initial - thread_full_width / 2 %}
+    {% set thread_z_offset = topic_z_offset_initial - (thread_full_width / 2) %}
+
     {% for thread in topic.threads %}
+
+        {# Threads on the left should be offset to the left and face right. #}
         {% if left %}
             {% set thread_x_offset = -topic_corridor_width / 2 %}
             {% set thread_y_rotation = 90 %}
+
+        {# Threads on the right should be offset to the right and face left. #}
         {% else %}
             {% set thread_x_offset = topic_corridor_width / 2 %}
             {% set thread_y_rotation = -90 %}
         {% endif %}
 
+        {# Render the thread #}
         <a-entity
             position="{{ thread_x_offset }} 0 {{ thread_z_offset }}"
             rotation="0 {{ thread_y_rotation }} 0">
             {% include './thread.html' %}
         </a-entity>
 
+        {# If the current thread is on the left, the next one should be on the right. #}
         {% if left %}
             {% set left = false %}
+
+        {#
+            If the current thread is on the right, the next one should be on the left.
+            The next thread will also need to be placed deeper along the z-axis.
+        #}
         {% else %}
             {% set left = true %}
             {% set thread_z_delta = topic_thread_gap + thread_full_width %}

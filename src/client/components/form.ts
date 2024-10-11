@@ -1,40 +1,23 @@
 'use strict';
 
 AFRAME.registerComponent('form', {
-    _inputs: [] as Element[],
+    _input_elements: [] as Element[],
     _tab_order: [] as number[],
-    _selected: 0,
+    _tab_order_index: 0,
 
+    // Initalize the form in the scene
     init: function(): void {
         // Disable wasd movement and the cursor
         document.querySelector('[camera]').removeAttribute('wasd-controls');
-        document.querySelector('#cursor').removeAttribute('cursor');
+        document.querySelector('[cursor]').setAttribute('raycaster', {
+            enabled: false
+        });
 
-        // Update the list of child input components
-        this._updateInputs();
-
-        // Listen for key presses
-        window.addEventListener('keydown', this._processKeyboardEvent);
-    },
-
-    remove: function() {
-        // Remove the form from the DOM
-        document.querySelector('[formmount]').innerHTML = '';
-
-        // Enable wasd movement and the cursor
-        document.querySelector('[camera]').setAttribute('wasd-controls', '');
-        document.querySelector('#cursor').setAttribute('cursor', '');
-
-        // Stop listening for key presses
-        window.removeEventListener('keydown', this._processKeyboardEvent);
-    },
-
-    _updateInputs: function(): void {
-        // Construct the form's list of inputs and tab order
-        this._inputs = [...this.el.querySelectorAll('[input]')];
+        // Construct the list of input elements and the tab order
+        this._input_elements = [...this.el.querySelectorAll('[input]')];
         this._tab_order = [];
-        for (var i = 0; i < this._inputs.length; i++) {
-            var input = this._inputs[i];
+        for (var i = 0; i < this._input_elements.length; i++) {
+            var input = this._input_elements[i];
             var type = input.getAttribute('type');
             if (type !== 'hidden') {
                 this._tab_order.push(i);
@@ -42,73 +25,80 @@ AFRAME.registerComponent('form', {
         }
 
         // Focus the first focusable input on the form
-        this._selected = 0;
-        this.getSelectedInputComponent().focus();
+        this._tab_order_index = 0;
+        this.get_selected_input_component().focus();
+
+        // Listen for key presses
+        window.addEventListener('keydown', this._process_keyboard_event);
     },
 
-    tab(backwards: boolean): void {
-        // Unfocus the originally selected component
-        var selectedComponent = this.getSelectedInputComponent();
-        selectedComponent.unfocus();
-
-        // Modify the selection index
-        if (backwards) {
-            this._selected--;
-            if (this._selected < 0) {
-                this._selected = this._tab_order.length - 1;
-            }
-        } else {
-            this._selected++;
-            this._selected %= this._tab_order.length;
-        }
-
-        // Focus the newly selected component
-        selectedComponent = this.getSelectedInputComponent();
-        selectedComponent.focus();
-    },
-
-    getSelectedInputComponent(): any {
-        // Get the A-Frame input component cooresponding to the selected input
-        var index: number = this._tab_order[this._selected];
-        var element: Element = this._inputs[index];
+    // Get the input component cooresponding to the selected input
+    get_selected_input_component(): any {
+        var index: number = this._tab_order[this._tab_order_index];
+        var element: Element = this._input_elements[index];
         var component = (element as any).components.input;
         return component;
     },
 
-    _processKeyboardEvent: function(event: KeyboardEvent): void {
-        event.preventDefault();
-
+    // Process keyboard events passed to the form
+    _process_keyboard_event: function(event: KeyboardEvent): void {
         // Get the form component
         var form = document.querySelector('[form]').components.form;
 
-        // Tab between focusable inputs
+        // If the user presses tab (and possibly shift), tab between focusable
+        // inputs
         if (event.key == 'Tab') {
+            event.preventDefault();
             form.tab(event.shiftKey);
-            return;
+        // Otherwise, forward the keyboard event to the selected input
+        } else {
+            var input_component = form.get_selected_input_component();
+            input_component.process_keyboard_event(event);
         }
-
-        // Forward the keyboard event to the selected control
-        var input_component = form.getSelectedInputComponent();
-        input_component.processKeyboardEvent(event);
     },
 
-    submit: async function() {
+    // Tab between form inputs
+    tab(backwards: boolean): void {
+        // Unfocus the originally selected component
+        var selected_component = this.get_selected_input_component();
+        selected_component.unfocus();
+
+        // If the user tabs backwards, decrement the tab order index
+        if (backwards) {
+            this._tab_order_index--;
+            if (this._tab_order_index < 0) {
+                this._tab_order_index = this._tab_order.length - 1;
+            }
+        // If the user tabs forward, increment the tab order index
+        } else {
+            this._tab_order_index++;
+            this._tab_order_index %= this._tab_order.length;
+        }
+
+        // Focus the newly selected component
+        selected_component = this.get_selected_input_component();
+        selected_component.focus();
+    },
+
+    // Attempt to submit the form
+    submit: async function(): Promise<void> {
         // Get all the inputs with name attributes
         var inputs: Element[] = [...this.el.querySelectorAll('[input]')]
             .filter((elm) => elm.hasAttribute('name'));
         
         // Construct a payload to send to the server based on the form inputs
         var payload = new URLSearchParams();
-        for (const input of inputs) {
+        for (var input of inputs) {
             var name = input.getAttribute('name');
             var value = input.getAttribute('value');
             payload.set(name!, value!);
         }
 
         // POST the payload to the server
+        var action: string = this.el.getAttribute('action');
         var response: Response;
         try {
-            response = await fetch('/', {
+            response = await fetch(action, {
                 method: 'POST',
                 body: payload
             });
@@ -126,17 +116,27 @@ AFRAME.registerComponent('form', {
             return;
         }
 
-        // Hot-swap the relevant piece of the DOM based on the action taken
-        if (payload.get('action') == 'post') {
-            var scene = document.querySelector('.scene');
-            scene.innerHTML = content;
-        } else if (payload.get('action') == 'reply') {
-            var post_id = payload.get('post_id');
-            var thread = document.querySelector(`[thread-post-id="${post_id}"]`);
-            thread.innerHTML = content;
-        }
+        // Hot-swap the relevant piece of the DOM
+        var selector: string = this.el.getAttribute('hotswap')!;
+        var element: Element = document.querySelector(selector);
+        element.outerHTML = content;
 
-        // Delete the form element after sucessful submission
+        // Remove the form after sucessful submission
         this.remove();
+    },
+
+    // Remove the form
+    remove: function(): void {
+        // Remove the form from the DOM
+        this.el.parentNode?.removeChild(this.el);
+
+        // Enable wasd movement and the cursor
+        document.querySelector('[camera]').setAttribute('wasd-controls', '');
+        document.querySelector('[cursor]').setAttribute('raycaster', {
+            enabled: true
+        });
+
+        // Stop listening for key presses
+        window.removeEventListener('keydown', this._process_keyboard_event);
     }
 });

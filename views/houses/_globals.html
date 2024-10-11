@@ -1,32 +1,88 @@
-{# Topics #}
+{#
+    Title: Global Template Variables
+#}
 
-{% set topics_row_depth = 10 %}
+{# Topics Page #}
 
-{% set house_width = 11 %}
-{% set house_height = 7 %}
-{% set house_depth = 5 %}
-{% set house_spacing = 10 %}
-{% set house_door_width = 3 %}
-{% set house_door_height = 2 %}
-{% set house_title_height = 4 %}
-{% set house_title_font_width = 15 %}
-{% set house_roof_height = 3 %}
+    {# How deep into the screen the row of houses should be (in meters) #}
+    {% set topics_row_depth = -10 %}
 
-{% set app_title_height = 10 %}
-{% set app_title_font_width = 30 %}
+    {# Topic House #}
 
-{# Topic #}
+        {# House Dimensions #}
 
-{% set topic_z_offset_initial = -20 %}
-{% set topic_corridor_width = 10 %}
-{% set topic_thread_gap = 4 %}
+            {% set house_width = 11 %}
+            {% set house_height = 7 %}
+            {% set house_depth = 5 %}
 
-{# Thread #}
+        {# House Spacing #}
 
-{% set thread_post_footprint_width = 2 %}
-{% set thread_post_footprint_depth = 2 %}
-{% set thread_columns = 5 %}
-{% set thread_padding = 2 %}
+            {% set house_spacing = 10 %}
 
-{% set thread_content_width = thread_columns * thread_post_footprint_width %}
-{% set thread_full_width = thread_content_width + 2 * thread_padding %}
+        {# Door #}
+
+            {% set house_door_width = 2 %}
+            {% set house_door_height = 3 %}
+
+        {# Topic Title #}
+
+            {% set house_title_y_offset = 4 %}
+            {% set house_title_font_width = 15 %}
+        
+        {# Roof #}
+
+            {% set house_roof_height = 3 %}
+
+    {# App Title #}
+
+        {% set app_title = 'VR Forum' %}
+        {% set app_title_y_offset = 10 %}
+        {% set app_title_font_width = 30 %}
+
+{# Topic Page #}
+
+    {# How deep into the screen the corridor should start (in meters) #}
+    {% set topic_z_offset_initial = -20 %}
+
+    {# How far the threads on the left should be from the threads on the right
+       (in meters) #}
+    {% set topic_corridor_width = 10 %}
+
+    {# How far neighboring threads should be separated from each other (in
+       meters) #}
+    {% set topic_thread_gap = 4 %}
+
+    {# Thread #}
+
+        {# Post/Reply Footprint #}
+
+            {% set thread_post_footprint_width = 2 %}
+            {% set thread_post_footprint_depth = 2 %}
+
+        {# Layout #}
+
+            {% set thread_lane_count = 5 %}
+            {% set thread_padding = 2 %}
+
+            {% set thread_content_width =
+                thread_lane_count * thread_post_footprint_width %}
+            {% set thread_full_width = thread_content_width +
+                (2 * thread_padding) %}
+
+            {#
+                Thread Layout Example
+                ---------------------
+
+                    1  2  3     - lanes
+                [*][*][*][*][*]
+                [*][r][ ][ ][*]
+                [*][ ][r][ ][*]
+                [*][ ][ ][r][*]
+                [*][ ][r][ ][*]
+                [*][p][ ][ ][*]
+                [*][*][*][*][*]
+
+                p - post
+                r - reply
+                * - padding
+            #}

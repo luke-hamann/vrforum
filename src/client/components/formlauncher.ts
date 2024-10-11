@@ -1,30 +1,25 @@
 'use strict';
 
 AFRAME.registerComponent('formlauncher', {
-    schema: {
-        action: {type: 'string'},
-        id: {type: 'int'},
-        name: {type: 'string'}
-    },
+    schema: { type: 'string' }, // The url of the form
 
-    init: function() {
-        var mount = document.querySelector('[formmount]');
-
-        this.el.addEventListener('click', async () => {
-            var action = this.data.action;
-            var url;
-            if (action == 'post') {
-                url = `/topic/${this.data.id}/post/`;
-            } else if (action == 'reply') {
-                url = `/post/${this.data.id}/reply/`;
-            } else {
+    // Initialize the form launcher in the scene
+    init: function (): void {
+        // Make the a-entity clickable to launch the form
+        this.el.addEventListener('click', async (): Promise<void> => {
+            // Fetch the form from the server
+            var url: string = this.data;
+            var form: string;
+            try {
+                var response: Response = await fetch(url);
+                if (!response.ok) return;
+                form = await response.text();
+            } catch {
                 return;
             }
 
-            var response = await fetch(url);
-            if (!response.ok) return;
-            var content = await response.text();
-            mount.innerHTML = content;
+            // Inject the form into the page
+            document.querySelector('[formmount]').innerHTML = form;
         });
     }
 });

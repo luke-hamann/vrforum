@@ -1,10 +1,18 @@
+{#
+    Title: Form Controls
+    Macros:
+        - label
+        - input
+        - backdrop
+#}
+
 {% macro label(value, y_offset) %}
 <a-entity
     text="
         color: black;
         value: {{ value }};
     "
-    position="0 {{ y_offset }} 0">
+    position="0 {{ y_offset }} 0.01">
 </a-entity>
 {% endmacro %}
 

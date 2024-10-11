@@ -1,8 +1,15 @@
 'use strict';
 
+// Constants for tracking which page the user is on
 enum CurrentPage {
     Topics,
     Topic
+}
+
+// An interface for describing a position
+interface Position {
+    x: number,
+    z: number
 }
 
 AFRAME.registerSystem('teleporter', {
@@ -10,10 +17,11 @@ AFRAME.registerSystem('teleporter', {
     _current_topic_id: -1,
     _player: document.querySelector('[camera]'),
     _scene: document.querySelector('.scene'),
-    _topics: new Map(),
-    _locked: false,
+    _topic_positions: new Map<number, Position>(),
+    _is_locked: false,
 
-    init: async function() {
+    // Initialize the teleporter system
+    init: async function(): Promise<void> {
         // Identify the current page and set the state accordingly
         var pathname = window.location.pathname;
         if (pathname == '/') {
@@ -22,55 +30,65 @@ AFRAME.registerSystem('teleporter', {
         } else {
             const re = /^\/topic\/(\d+)\/$/;
             var match = pathname.match(re);
-            if (match !== null) {
+            if (match != null) {
                 this._current_page = CurrentPage.Topic;
                 this._current_topic_id = Number(match[1]);
             }
         }
 
-        // Get the topic houses (containing their coordinates)
-        var source = document;
+        // If the user is on the topics page, we already have the coordinates of
+        // the topic houses
+        var source: Document = document;
+
+        // If the user is on a topic page, we need to fetch the topics page to
+        // get the coordinates of the topic houses
         if (this._current_page == CurrentPage.Topic) {
-            var parser = new DOMParser();
-            var response = await fetch('/', {headers: {'Refresh': ''}});
+            var response = await fetch('/', { headers: { 'Refresh': '' } });
             var text = await response.text();
+            var parser = new DOMParser();
             source = parser.parseFromString(text, 'text/html');
         }
 
-        // Map the topic ids to their coordinates
+        // Generate a map to link topic ids with the coordinates of their houses
         var topic_elements = [...source.querySelectorAll('[topic-id]')];
         for (var elm of topic_elements) {
             var topic_id = Number(elm.getAttribute('topic-id'));
             var x = Number(elm.getAttribute('absolute-x'));
             var z = Number(elm.getAttribute('absolute-z'));
-            this._topics.set(topic_id, { x, z });
+            this._topic_positions.set(topic_id, { x, z });
         }
 
         // Reload the page when the user clicks the back button
-        window.addEventListener("popstate", (event) => {
+        window.addEventListener("popstate", (): void => {
             window.location.reload();
         });
     },
 
-    _getPlayerPosition: function(): {x: number, z: number} {
-        // Get the x and z coordinates of the player
+    // Get the coordinates of the player
+    _get_player_position: function(): Position {
         return {
             x: (this._player as any).object3D.position.x as number,
             z: (this._player as any).object3D.position.z as number
         };
     },
 
-    tick: function() {
-        if (this._locked) return;
+    // Watch for cross-page navigation based on the player's position
+    tick: function(): void {
+        // When a page is being navigated to, prevent multiple page requests
+        if (this._is_locked) return;
 
+        // If the user may be navigating to an individual topic
         if (this._current_page == CurrentPage.Topics) {
-            var player_pos = this._getPlayerPosition();
+            var player_position: Position = this._get_player_position();
 
-            if (player_pos.z > -10 || player_pos.z < -11) return;
+            // Determine if the player is deep enough on the z-axis to be at the
+            // topic houses
+            if (player_position.z > -10 || player_position.z < -11) return;
 
+            // Determine if the player is close enough to a given topic door
             this._current_topic_id = -1;
-            for (var [topic_id, topic_pos] of this._topics) {
-                if (Math.abs(player_pos.x - topic_pos.x) < 1) {
+            for (var [topic_id, topic_position] of this._topic_positions) {
+                if (Math.abs(player_position.x - topic_position.x) < 1) {
                     this._current_topic_id = topic_id;
                     break;
                 }
@@ -78,7 +96,9 @@ AFRAME.registerSystem('teleporter', {
 
             if (this._current_topic_id < 0) return;
 
-            this._locked = true;
+            this._is_locked = true;
+
+            // Request and transition to the selected topic page
             var url = `/topic/${this._current_topic_id}/`;
             fetch(url, { headers: { 'Refresh': '' }})
             .then((response) => response.text())
@@ -91,12 +111,17 @@ AFRAME.registerSystem('teleporter', {
                 this._player.object3D.position.x = 0;
                 this._player.object3D.position.z = 0;
 
-                this._locked = false;
-            })
-        } else if (this._current_page == CurrentPage.Topic) {
-            if (this._getPlayerPosition().z <= 0) return;
+                this._is_locked = false;
+            });
 
-            this._locked = true;
+        // If the user may be navigating to the topics page
+        } else if (this._current_page == CurrentPage.Topic) {
+            // Check if the user has not entered topic exit wall
+            if (this._get_player_position().z <= 0) return;
+
+            this._is_locked = true;
+
+            // Request and transition to the topics page
             var url = '/';
             fetch(url, { headers: { 'Refresh': '' }})
             .then((response) => response.text())
@@ -106,11 +131,12 @@ AFRAME.registerSystem('teleporter', {
 
                 window.history.pushState(undefined, '', url);
                 
-                var topic = this._topics.get(this._current_topic_id);
-                this._player.object3D.position.x = topic.x;
-                this._player.object3D.position.z = topic.z;
+                var topic_position =
+                    this._topic_positions.get(this._current_topic_id)!;
+                this._player.object3D.position.x = topic_position.x;
+                this._player.object3D.position.z = topic_position.z;
 
-                this._locked = false;
+                this._is_locked = false;
             });
         }
     }

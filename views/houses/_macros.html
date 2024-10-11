@@ -1,3 +1,11 @@
+{#
+    Title: Helper macros for rendering
+    Macros:
+        - text
+        - backdrop
+#}
+
+{# Create a text box #}
 {% macro text(class, align, color, width, value, x, y, z) %}
 <a-entity
     class="{{ class }}"
@@ -12,13 +20,14 @@
 </a-entity>
 {% endmacro %}
 
+{# Create a backdrop for text #}
 {% macro backdrop(class, color, width, height, x, y, z) %}
 <a-plane
     class="{{ class }}"
     color="{{ color }}"
     material="side: double;"
-    height="{{ height }}"
     width="{{ width }}"
+    height="{{ height }}"
     position="{{ x }} {{ y }} {{ z }}">
 </a-plane>
 {% endmacro %}

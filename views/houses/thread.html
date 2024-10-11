@@ -1,4 +1,5 @@
 {#
+    Title: Thread
     Parameters:
         - thread: Thread
 #}
@@ -8,65 +9,92 @@
 {% from './_globals.html' import
     thread_post_footprint_width,
     thread_post_footprint_depth,
-    thread_columns,
+    thread_lane_count,
     thread_padding,
     thread_content_width,
     thread_full_width
 %}
 
+{#
+    The depth of the thread carpet is the sum of:
+        * The depth of the footprints of the post and all replies
+        * Twice the padding
+#}
 {% set thread_carpet_depth =
     (thread_post_footprint_depth * (thread.replies.length + 1)) +
-    (thread_padding * 2)
+    (2 * thread_padding)
 %}
 
+{# Render the thread -------------------------------------------------------- #}
+
 <a-entity thread-post-id="{{ thread.post.id }}">
+
+    {# Render the carpet ---------------------------------------------------- #}
+
     <a-plane
-        class="thread_carpet"
+        class="thread-carpet"
         color="blue"
         width="{{ thread_full_width }}"
         height="{{ thread_carpet_depth }}"
-        position="0 0.1 {{ -thread_carpet_depth / 2 }}"
+        position="0 0 {{ -thread_carpet_depth / 2 }}"
         rotation="-90 0 0">
     </a-plane>
 
-    {% set x_offset = - thread_padding - thread_post_footprint_width %}
-    {% set z_offset = - thread_padding - (thread_post_footprint_depth / 2) %}
+    {# Render the post ------------------------------------------------------ #}
+
+    {% set x_offset = -(thread_full_width / 2) + thread_padding +
+        (thread_post_footprint_width / 2) %}
+    {% set z_offset = -thread_padding - (thread_post_footprint_depth / 2) %}
+
+    {% set post_details = thread.post.date_time.toDateString() + '\n\n' +
+        thread.post.body %}
+
     <a-entity
+        class="post"
         position="{{ x_offset }} 0 {{ z_offset }}"
-        formlauncher="action: reply; id: {{ thread.post.id }};">
+        formlauncher="/post/{{ thread.post.id }}/reply/">
         {{ backdrop('post-backdrop', 'white', 1.5, 1.5, 0, 1.5, -0.01) }}
         {{ text('post-title', 'left', 'black', 1.5, thread.post.title, 0.25, 2,
             0) }}
-
-        {% set post_details = thread.post.date_time.toDateString() + '\n\n' +
-            thread.post.body %}
         {{ text('post-details', 'left', 'black', 1, post_details, 0, 1.9, 0) }}
     </a-entity>
 
+    {# Render the replies --------------------------------------------------- #}
+
+    {% set reply_title = 'Re: ' + thread.post.title %}
+
+    {# Initialize the counter and set an initial depth for the reply. #}
     {% set i = 1 %}
-    {% set z_offset = -thread_padding - (1.5 * thread_post_footprint_depth) %}
+    {% set z_offset = z_offset - thread_post_footprint_depth %}
     {% for reply in thread.replies %}
 
-        {% set a = thread_columns %}
-        {% set current_column = -Math.abs(i % (2 * a - 2) - a + 1) + a - 1 %}
+        {# Calculate which lane the reply should be in #}
+        {% set a = thread_lane_count %}
+        {% set lane_index = -Math.abs(i % (2 * a - 2) - a + 1) + a - 1 %}
 
-        {% set x_offset = (current_column * thread_post_footprint_width) -
-                        (thread_content_width / 2) +
-                        (thread_post_footprint_width / 2)
+        {# Calculate the x_offset based on the lane #}
+        {% set x_offset = (lane_index * thread_post_footprint_width) -
+            (thread_content_width / 2) + (thread_post_footprint_width / 2)
         %}
 
-        <a-entity class="reply"
+        <a-entity
+            class="reply"
             position="{{ x_offset }} 0 {{ z_offset }}"
-            formlauncher="action: reply; id: {{ thread.post.id }};">
-            {% set title = 'Re: ' + thread.post.title %}
-            {% set content = reply.date_time.toDateString() + '\n\n' +
+            formlauncher="/post/{{ thread.post.id }}/reply/">
+
+            {% set reply_content = reply.date_time.toDateString() + '\n\n' +
                 reply.body %}
 
             {{ backdrop('reply-backdrop', 'white', 1.5, 1.5, 0, 1.5 -0.01) }}
-            {{ text('reply-title', 'left', 'black', 1.5, title, 0.25, 2, 0) }}
-            {{ text('reply-content', 'left', 'black', 1, content, 0, 1.9, 0) }}
+            {{ text('reply-title', 'left', 'black', 1.5, reply_title, 0.25, 2,
+                0) }}
+            {{ text('reply-content', 'left', 'black', 1, reply_content, 0, 1.9,
+                0) }}
         </a-entity>
+
+        {# Increment the counter and move the next reply further back. #}
         {% set i = i + 1 %}
         {% set z_offset = z_offset - thread_post_footprint_depth %}
     {% endfor %}
+
 </a-entity>
