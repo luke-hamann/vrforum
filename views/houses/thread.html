@@ -85,14 +85,11 @@
             {% set reply_content = reply.date_time.toDateString() + '\n\n' +
                 reply.body %}
 
+            {% include '../resources/tablet.html' %}
             {{ text('reply-title', 'left', 'black', 1.5, reply_title, 0.25, 2,
                 0) }}
             {{ text('reply-content', 'left', 'black', 1, reply_content, 0, 1.9,
                 0) }}
-                
-
-                <!-- Tablet backdrop  -->
-                {% include '../resources/tablet.html' %}
         </a-entity>
 
         {# Increment the counter and move the next reply further back. #}
