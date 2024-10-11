@@ -28,7 +28,7 @@
 
 <a-entity class="topics">
 
-    {# Application title --------------------------------------------------- #}
+    {# Application title ---------------------------------------------------- #}
 
     {{ text(
         class='app-title',
@@ -40,7 +40,7 @@
         y=app_title_y_offset,
         z=topics_row_depth) }}
 
-    {# Render the houses --------------------------------------------------- #}
+    {# Render the houses ---------------------------------------------------- #}
 
     {% set x_offset = -(house_row_width / 2) + (house_width / 2) %}
     {% for topic in topics %}
@@ -65,7 +65,9 @@
             <a-entity
                 class="roof"
                 position="0 {{ house_height }} 0"
-                scale="{{ house_width }} {{ house_roof_height }} {{ house_depth }}">
+                scale="
+                    {{ house_width }} {{ house_roof_height }} {{ house_depth }}"
+                >
 
                 {# Front triangle #}
                 <a-triangle
