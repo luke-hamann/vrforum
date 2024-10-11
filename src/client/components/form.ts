@@ -9,7 +9,7 @@ AFRAME.registerComponent('form', {
     init: function(): void {
         // Disable wasd movement and the cursor
         document.querySelector('[camera]').removeAttribute('wasd-controls');
-        document.querySelector('#cursor').setAttribute('raycaster', {
+        document.querySelector('[cursor]').setAttribute('raycaster', {
             enabled: false
         });
 
@@ -132,7 +132,7 @@ AFRAME.registerComponent('form', {
 
         // Enable wasd movement and the cursor
         document.querySelector('[camera]').setAttribute('wasd-controls', '');
-        document.querySelector('#cursor').setAttribute('raycaster', {
+        document.querySelector('[cursor]').setAttribute('raycaster', {
             enabled: true
         });
 
