@@ -29,7 +29,6 @@ app.use('/lib', express.static('lib'));
 app.use('/js', express.static('build/client'));
 app.use('/src/client', express.static('src/client'));
 
-
 // Handle internal server errors
 function internal_server_error(response: express.Response): void {
     response.status(500).send('<h1>500</h1><p>Something went wrong.</p>');
