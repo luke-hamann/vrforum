@@ -12,12 +12,12 @@ const app = express();
 const port = 8001;
 
 // Nunjucks configuration
-nunjucks.configure('../../views', {
-    autoescape: true,
-    express: app,       // For using Nunjucks with Express
-    throwOnUndefined: true,  // Enable better error reporting
-    noCache: true       // Disable caching for development
-});
+// nunjucks.configure('../../views', {
+//     autoescape: true,
+//     express: app,       // For using Nunjucks with Express
+//     throwOnUndefined: true,  // Enable better error reporting
+//     noCache: true       // Disable caching for development
+// });
 
 
 

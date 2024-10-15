@@ -1,0 +1,99 @@
+
+  <!-- 
+   A tablet to act as backdrop for posts/replies 
+   -->
+
+
+{% set tablet_color = "white" %}
+
+  <!--TABLET-CENTER:CUBE-->
+<a-box 
+id="target-cube" 
+rotation="0 0 0"  
+color="{{ tablet_color }}"
+event-set__click="_event: click;"
+position=" 0 0 -0.05"  
+opacity="0.80"
+width=1
+height=1.41421
+depth=0.1
+scale=1.275
+>
+<a-text 
+  mixin="text" 
+  position="0 0.60711 0.05" 
+  width="1.2"
+  wrap-count="60"></a-text>
+
+<!-- TABLET-EDGES:SIDES -->
+<a-box
+    color="{{ tablet_color }}"
+    depth=0.1
+    height=1.41421
+    width=0.1
+    position="0.55 0 0"
+  ></a-box>
+<a-box
+  color="{{ tablet_color }}"
+  depth=0.1
+  height=1.41421
+  width=0.1
+  position="-0.55 0 0"
+></a-box>
+<!-- TABLET - EDGES: TOP& BOTTOM -->
+<a-box
+  color="{{ tablet_color }}"
+  depth=0.1
+  height=0.1
+  width=1
+  position="0 -0.75711 0"
+  ></a-box>
+<a-box
+  color="{{ tablet_color }}"
+  depth=0.1
+  height=0.1
+  width=1
+  position="0 0.75711 0"
+></a-box>
+<!--TABLET-       CORNERS:circles-->
+<a-entity
+  geometry="primitive: cylinder;
+            thetaLength: 90;
+            height: 0.1;
+            radius: 0.1;
+            "
+  material="color: {{ tablet_color }}; flatShading: true"
+  position="0.5 0.70711 0"
+  rotation="0 90 90"
+></a-entity>
+<a-entity
+  geometry="primitive: cylinder;
+            thetaLength: 90;
+            height: 0.1;
+            radius: 0.1;
+            "
+  material="color: {{ tablet_color }}; flatShading: true"
+  position="-0.5 0.70711 0"
+  rotation="-90 90 90"
+></a-entity>
+<a-entity
+  geometry="primitive: cylinder;
+            thetaLength: 90;
+            height: 0.1;
+            radius: 0.1;
+            "
+  material="color: {{ tablet_color }}; flatShading: true"
+  position="0.5 -0.70711 0"
+  rotation="90 90 90"
+></a-entity>
+<a-entity
+  geometry="primitive: cylinder;
+            thetaLength: 90;
+            height: 0.1;
+            radius: 0.1;
+            "
+  material="color: {{ tablet_color }}; flatShading: true"
+  position="-0.5 -0.70711 0"
+  rotation="180 90 90"
+></a-entity>
+</a-box>
