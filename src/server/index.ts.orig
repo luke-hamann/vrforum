@@ -11,7 +11,19 @@ import Database from './models/database.js';
 const app = express();
 const port = 8001;
 
+<<<<<<< HEAD
+// Nunjucks configuration
+// nunjucks.configure('../../views', {
+//     autoescape: true,
+//     express: app,       // For using Nunjucks with Express
+//     throwOnUndefined: true,  // Enable better error reporting
+//     noCache: true       // Disable caching for development
+// });
 
+
+
+=======
+>>>>>>> 847586e70a2a3466b5c30b91316fc1dbdaa770ff
 // Read url-encoded post data
 app.use(express.urlencoded({ extended: true }));
 
@@ -19,7 +31,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/lib', express.static('lib'));
 app.use('/js', express.static('build/client'));
 app.use('/src/client', express.static('src/client'));
-
 
 // Handle internal server errors
 function internal_server_error(response: express.Response): void {
