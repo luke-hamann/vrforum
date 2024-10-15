@@ -11,7 +11,6 @@ import Database from './models/database.js';
 const app = express();
 const port = 8001;
 
-
 // Read url-encoded post data
 app.use(express.urlencoded({ extended: true }));
 
@@ -19,7 +18,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/lib', express.static('lib'));
 app.use('/js', express.static('build/client'));
 app.use('/src/client', express.static('src/client'));
-
 
 // Handle internal server errors
 function internal_server_error(response: express.Response): void {
